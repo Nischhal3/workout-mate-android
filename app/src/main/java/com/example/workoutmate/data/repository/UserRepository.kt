@@ -2,10 +2,11 @@ package com.example.workoutmate.data.repository
 
 import android.content.Context
 import com.example.workoutmate.data.User
+import com.example.workoutmate.data.dao.UserDao
 import com.example.workoutmate.data.db.AppDatabase
 
 class UserRepository private constructor(
-    private val userDao: com.example.workoutmate.data.dao.UserDao
+    private val userDao: UserDao
 ) {
     companion object {
         @Volatile
@@ -21,14 +22,14 @@ class UserRepository private constructor(
         }
     }
 
+    suspend fun usernameExists(username: String): Boolean {
+        return userDao.usernameExists(username.trim())
+    }
+
     suspend fun createUser(username: String): Long {
         val user = User(
             username = username
         )
         return userDao.insert(user)
-    }
-
-    suspend fun getUserById(id: Long): User? {
-        return userDao.getById(id)
     }
 }

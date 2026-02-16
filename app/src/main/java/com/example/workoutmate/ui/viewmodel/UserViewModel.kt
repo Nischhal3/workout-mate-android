@@ -7,19 +7,40 @@ import com.example.workoutmate.data.repository.UserRepository
 import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
+    private val userRepository = UserRepository.getInstance(application)
 
-    private val repository = UserRepository.getInstance(application)
+    fun createUser(
+        username: String, onError: (String) -> Unit, onSuccess: () -> Unit
+    ) {
+        val trimmed = username.trim()
+        if (trimmed.isEmpty()) {
+            onError("Username cannot be empty")
+            return
+        }
 
-    fun createUser(username: String) {
         viewModelScope.launch {
-            repository.createUser(username)
+            val exists = userRepository.usernameExists(trimmed)
+            if (exists) {
+                onError("User already exists")
+            } else {
+                userRepository.createUser(trimmed)
+                onSuccess()
+            }
         }
     }
 
-    fun getUserById(id: Long, onResult: (String?) -> Unit) {
+    fun loginByUsername(
+        username: String, onError: (String) -> Unit, onSuccess: () -> Unit
+    ) {
+        val trimmed = username.trim()
+        if (trimmed.isEmpty()) {
+            onError("Enter username")
+            return
+        }
+
         viewModelScope.launch {
-            val user = repository.getUserById(id)
-            onResult(user?.username)
+            val exists = userRepository.usernameExists(trimmed)
+            if (exists) onSuccess() else onError("User not found. Create user first.")
         }
     }
 }

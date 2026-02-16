@@ -47,11 +47,16 @@ dependencies {
     // Room db
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.compose.animation.core)
 
     // Room Code Generator
     ksp(libs.room.compiler)
 
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
+
+    implementation(libs.androidx.navigation.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

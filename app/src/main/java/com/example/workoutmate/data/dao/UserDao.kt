@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
+    @Query("SELECT EXISTS(SELECT 1 FROM users WHERE username = :username LIMIT 1)")
+    suspend fun usernameExists(username: String): Boolean
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(user: User): Long
-
-    @Query("SELECT * FROM users WHERE userId = :id LIMIT 1")
-    suspend fun getById(id: Long): User?
 
     @Delete
     suspend fun delete(user: User)
