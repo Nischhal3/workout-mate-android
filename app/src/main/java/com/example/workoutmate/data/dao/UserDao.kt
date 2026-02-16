@@ -9,9 +9,6 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(user: User): Long
 
-    @Query("SELECT * FROM users ORDER BY createdAtEpochMs DESC")
-    fun observeUsers(): Flow<List<User>>
-
     @Query("SELECT * FROM users WHERE userId = :id LIMIT 1")
     suspend fun getById(id: Long): User?
 
