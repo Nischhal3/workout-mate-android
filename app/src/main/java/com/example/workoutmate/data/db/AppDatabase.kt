@@ -1,0 +1,37 @@
+package com.example.workoutmate.data.db
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.example.workoutmate.data.User
+import com.example.workoutmate.data.dao.UserDao
+
+@Database(
+    entities = [
+        User::class,
+    ],
+    version = 1,
+    exportSchema = true
+)
+@TypeConverters(Converters::class)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun userDao(): UserDao
+
+    companion object {
+        @Volatile private var INSTANCE: AppDatabase? = null
+
+        fun get(context: Context): AppDatabase =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    "workout_mate.db"
+                )
+                    .fallbackToDestructiveMigration() // OK for early dev/testing
+                    .build()
+                    .also { INSTANCE = it }
+            }
+    }
+}
