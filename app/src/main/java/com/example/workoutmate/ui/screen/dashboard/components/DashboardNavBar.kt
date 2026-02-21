@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workoutmate.ui.screen.components.roundedTopBar
 import com.example.workoutmate.ui.theme.DarkGreen
-import com.example.workoutmate.ui.theme.LightGray
+import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.LightGreen
 
 @Composable
@@ -39,8 +39,8 @@ fun DashboardNavBar(
             .fillMaxWidth()
             .navigationBarsPadding()
             .roundedTopBar(
-                strokeWidth = 1.dp, leftColor = LightGray, rightColor = LightGray, radius = 20.dp
-            ), color = LightGreen, shape = RoundedCornerShape(
+                strokeWidth = 1.dp, leftColor = LightSage, rightColor = LightSage, radius = 20.dp
+            ), color = DarkGreen, shape = RoundedCornerShape(
             topStart = 20.dp, topEnd = 20.dp
         )
     ) {
@@ -57,7 +57,7 @@ fun DashboardNavBar(
             ) {
                 IconButton(onClick = onHomeClick) {
                     Icon(
-                        tint = DarkGreen,
+                        tint = LightGreen,
                         contentDescription = "Home",
                         imageVector = Icons.Default.Home,
                         modifier = Modifier.size(36.dp)
@@ -67,7 +67,7 @@ fun DashboardNavBar(
 
             Text(
                 fontSize = 18.sp,
-                color = DarkGreen,
+                color = LightGreen,
                 text = "Dashboard",
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
@@ -79,7 +79,7 @@ fun DashboardNavBar(
             ) {
                 IconButton(onClick = onAddClick) {
                     Icon(
-                        tint = DarkGreen,
+                        tint = LightGreen,
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add Workout",
                         modifier = Modifier.size(36.dp)
