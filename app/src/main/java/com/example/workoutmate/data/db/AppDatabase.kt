@@ -29,7 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "workout_mate.db"
                 )
-                    .fallbackToDestructiveMigration() // OK for early dev/testing
+                    .fallbackToDestructiveMigration(true) // OK for early dev/testing
                     .build()
                     .also { INSTANCE = it }
             }
