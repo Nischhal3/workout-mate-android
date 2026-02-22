@@ -65,6 +65,8 @@ dependencies {
     // Room Code Generator
     ksp(libs.room.compiler)
 
+    implementation(libs.material.icons.extended)
+
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     implementation(libs.androidx.navigation.compose)

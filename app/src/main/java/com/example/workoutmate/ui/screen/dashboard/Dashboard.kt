@@ -1,11 +1,9 @@
 package com.example.workoutmate.ui.screen.dashboard
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -15,25 +13,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.workoutmate.ui.screen.components.DatePickerDialog
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardHeader
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardNavBar
 import com.example.workoutmate.ui.screen.dashboard.components.ExerciseList
+import com.example.workoutmate.ui.screen.dashboard.components.workoutform.WorkoutForm
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.White
 import com.example.workoutmate.ui.viewmodel.UserViewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Dashboard(userViewModel: UserViewModel) {
     val username by userViewModel.username.collectAsState()
 
     var openDialog by remember { mutableStateOf(false) }
-    var selectedDateLabel by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = White, bottomBar = {
@@ -60,16 +53,7 @@ fun Dashboard(userViewModel: UserViewModel) {
         }
     }
 
-    DatePickerDialog(
-        open = openDialog,
-        onDismiss = { openDialog = false },
-        disablePastDates = true,
-        onDateSelected = { date ->
-            selectedDateLabel = date.toPrettyDateString()
-        })
-}
-
-fun LocalDate.toPrettyDateString(): String {
-    val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
-    return this.format(formatter)
+    if (openDialog) {
+        WorkoutForm(onBackClick = { openDialog = false })
+    }
 }
