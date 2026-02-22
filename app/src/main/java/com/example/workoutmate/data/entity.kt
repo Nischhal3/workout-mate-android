@@ -39,8 +39,6 @@ data class WorkoutDay(
     val title: String,
     val date: LocalDate,
     val notes: String? = null,
-    val startedAtEpochMs: Long? = null,
-    val endedAtEpochMs: Long? = null
 )
 
 @Entity(

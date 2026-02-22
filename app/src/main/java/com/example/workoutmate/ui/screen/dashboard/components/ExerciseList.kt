@@ -49,8 +49,6 @@ fun ExerciseList() {
             title = "Chest Day",
             date = LocalDate.now(),
             notes = "Focused on incline press",
-            startedAtEpochMs = 1708500000000,
-            endedAtEpochMs = 1708503600000
         ),
 
         WorkoutDay(
@@ -59,8 +57,6 @@ fun ExerciseList() {
             title = "Leg Day",
             date = LocalDate.now().minusDays(1),
             notes = "Heavy squats",
-            startedAtEpochMs = 1708413600000,
-            endedAtEpochMs = 1708417200000
         ),
 
         WorkoutDay(
@@ -69,8 +65,6 @@ fun ExerciseList() {
             title = "Back Workout",
             date = LocalDate.now().minusDays(2),
             notes = "Deadlifts & rows",
-            startedAtEpochMs = 1708327200000,
-            endedAtEpochMs = 1708330800000
         ),
 
         WorkoutDay(
@@ -79,8 +73,6 @@ fun ExerciseList() {
             title = "Shoulders",
             date = LocalDate.now().minusDays(3),
             notes = null,
-            startedAtEpochMs = 1708240800000,
-            endedAtEpochMs = 1708242600000
         ),
 
         WorkoutDay(
@@ -89,32 +81,24 @@ fun ExerciseList() {
             title = "Arms",
             date = LocalDate.now().minusDays(4),
             notes = "Biceps + Triceps",
-            startedAtEpochMs = 1708154400000,
-            endedAtEpochMs = 1708158000000
         ), WorkoutDay(
             workoutDayId = 6,
             userId = 1,
             title = "Arms",
             date = LocalDate.now().minusDays(4),
             notes = "TEst + Triceps",
-            startedAtEpochMs = 1708154400000,
-            endedAtEpochMs = 1708158000000
         ), WorkoutDay(
             workoutDayId = 7,
             userId = 1,
             title = "Arms",
             date = LocalDate.now().minusDays(4),
             notes = "TEst + Triceps",
-            startedAtEpochMs = 1708154400000,
-            endedAtEpochMs = 1708158000000
         ), WorkoutDay(
             workoutDayId = 8,
             userId = 1,
             title = "Arms",
             date = LocalDate.now().minusDays(4),
             notes = "TEst + Triceps",
-            startedAtEpochMs = 1708154400000,
-            endedAtEpochMs = 1708158000000
         )
     )
 
