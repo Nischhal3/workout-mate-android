@@ -1,47 +1,54 @@
 package com.example.workoutmate.ui.screen.dashboard
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.example.workoutmate.ui.screen.components.DatePickerDialog
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardHeader
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardNavBar
 import com.example.workoutmate.ui.screen.dashboard.components.ExerciseList
-import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.LightGreen
+import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.White
+import com.example.workoutmate.ui.viewmodel.UserViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Dashboard() {
+fun Dashboard(userViewModel: UserViewModel) {
+    val username by userViewModel.username.collectAsState()
+
     var openDialog by remember { mutableStateOf(false) }
     var selectedDateLabel by remember { mutableStateOf("") }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .background(White)
-    ) {
+    Scaffold(
+        containerColor = White, bottomBar = {
+            DashboardNavBar(onHomeClick = { }, onAddClick = { openDialog = true })
+        }) { _ ->
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            DashboardHeader(username = "Nischhal", onProfileClick = { }, onSettingsClick = { })
-            HorizontalDivider(Modifier.height(1.dp), color = LightSage)
+            DashboardHeader(
+                onProfileClick = { },
+                onSettingsClick = { },
+                username = username ?: "Not logged in",
+            )
+
+            HorizontalDivider(color = LightSage)
 
             Box(
                 modifier = Modifier
@@ -49,9 +56,6 @@ fun Dashboard() {
                     .background(LightGreen)
             ) {
                 ExerciseList()
-            }
-            Box(modifier = Modifier.background(LightGreen)) {
-                DashboardNavBar(onHomeClick = { }, onAddClick = { openDialog = true })
             }
         }
     }

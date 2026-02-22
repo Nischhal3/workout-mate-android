@@ -10,7 +10,6 @@ import com.example.workoutmate.ui.screen.dashboard.Dashboard
 import com.example.workoutmate.ui.screen.Home
 import com.example.workoutmate.ui.viewmodel.UserViewModel
 
-
 object Routes {
     const val HOME = "home"
     const val DASHBOARD = "dashboard"
@@ -35,7 +34,7 @@ fun NavGraph(
         }
 
         composable(Routes.DASHBOARD) {
-            Dashboard()
+            Dashboard(userViewModel)
         }
     }
 }

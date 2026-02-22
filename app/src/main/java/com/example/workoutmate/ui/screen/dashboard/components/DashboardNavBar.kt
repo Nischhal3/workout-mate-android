@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,8 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workoutmate.ui.screen.components.roundedTopBar
 import com.example.workoutmate.ui.theme.DarkGreen
-import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.LightGreen
+import com.example.workoutmate.ui.theme.LightSage
 
 @Composable
 fun DashboardNavBar(
@@ -37,7 +36,6 @@ fun DashboardNavBar(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
             .roundedTopBar(
                 strokeWidth = 1.dp, leftColor = LightSage, rightColor = LightSage, radius = 20.dp
             ), color = DarkGreen, shape = RoundedCornerShape(

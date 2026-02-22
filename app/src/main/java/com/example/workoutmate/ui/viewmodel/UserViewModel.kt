@@ -4,10 +4,15 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workoutmate.data.repository.UserRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository.getInstance(application)
+
+    private val _username = MutableStateFlow<String?>(null)
+    val username: StateFlow<String?> = _username
 
     fun createUser(
         username: String, onError: (String) -> Unit, onSuccess: () -> Unit
@@ -40,7 +45,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             val exists = userRepository.usernameExists(trimmed)
-            if (exists) onSuccess() else onError("User not found. Create user first.")
+            if (exists) {
+                _username.value = trimmed
+                onSuccess()
+            } else {
+                onError("User not found. Create user first.")
+            }
         }
     }
 }

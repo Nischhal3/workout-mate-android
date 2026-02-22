@@ -38,7 +38,6 @@ fun DashboardHeader(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
             .roundedTopBar(
                 strokeWidth = 1.dp, leftColor = LightSage, rightColor = LightSage, radius = 20.dp
             ), color = DarkGreen, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
