@@ -6,9 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.workoutmate.data.User
 import com.example.workoutmate.data.repository.UserRepository
 import com.example.workoutmate.data.repository.WorkoutRepository
+import com.example.workoutmate.utils.LogType
+import com.example.workoutmate.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+
+private const val TAG = "UserViewModel"
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository(application)
@@ -30,8 +34,10 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             val existingUser = userRepository.getUserByUsername(trimmed)
             if (existingUser != null) {
                 onError("User already exists")
+                Logger(TAG, "User already exists.", LogType.ERROR)
             } else {
                 userRepository.createUser(trimmed)
+                Logger(TAG, "Created user with username: $username.")
                 onSuccess()
             }
         }
