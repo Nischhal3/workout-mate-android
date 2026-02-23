@@ -46,7 +46,7 @@ val CustomTypography = Typography(
     ),
 
     bodyMedium = body.copy(
-        fontSize = 18.sp
+        fontSize = 18.sp,
     ),
 
     bodySmall = body.copy(

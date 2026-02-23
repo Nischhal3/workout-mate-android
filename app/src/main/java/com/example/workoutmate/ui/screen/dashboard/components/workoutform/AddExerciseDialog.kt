@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -34,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.workoutmate.ui.screen.components.CompactTextField
 import com.example.workoutmate.ui.screen.components.InputTextField
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.Green
@@ -80,11 +80,17 @@ fun AddExerciseDialog(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
+                .offset(y = (-25).dp)
                 .heightIn(max = 450.dp)
                 .verticalScroll(scrollState)
         ) {
             InputTextField(
-                value = setName, onValueChange = { setName = it }, label = "Set Name"
+                value = setName,
+                label = "Set Name",
+                onValueChange = { setName = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
             )
 
             exerciseEntries.forEachIndexed { index, entry ->
@@ -152,19 +158,21 @@ fun ExerciseEntryRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CompactTextField(
-                value = entry.weight,
-                onValueChange = onWeightChange,
+            InputTextField(
                 label = "Weight",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f)
+                value = entry.weight,
+                verticalPadding = 8.dp,
+                onValueChange = onWeightChange,
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
-            CompactTextField(
-                value = entry.reps,
-                onValueChange = onRepsChange,
+            InputTextField(
                 label = "Reps",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f)
+                value = entry.reps,
+                verticalPadding = 8.dp,
+                onValueChange = onRepsChange,
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
             IconButton(onClick = onDelete) {

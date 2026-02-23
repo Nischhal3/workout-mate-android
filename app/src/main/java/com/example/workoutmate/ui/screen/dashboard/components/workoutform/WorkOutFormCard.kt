@@ -52,8 +52,6 @@ fun WorkoutFormCard(
                 onBackClick = onBackClick,
                 onSaveClick = { /* handle save */ })
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Selected date: $selectedDate",
@@ -61,10 +59,12 @@ fun WorkoutFormCard(
                     fontSize = 14.sp,
                     modifier = Modifier.padding(start = 8.dp, top = 4.dp)
                 )
+                Spacer(modifier = Modifier.height(10.dp))
 
                 InputTextField(
                     value = workoutTitle,
                     label = "Workout Title",
+                    modifier = Modifier.fillMaxWidth(),
                     onValueChange = { workoutTitle = it },
                     trailingContent = {
                         IconButton(onClick = onDateClick) {

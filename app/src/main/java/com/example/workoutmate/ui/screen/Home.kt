@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.workoutmate.ui.screen.components.FlipCard
+import com.example.workoutmate.ui.screen.components.InputTextField
 import com.example.workoutmate.ui.viewmodel.UserViewModel
 
 private enum class CardSide { CREATE, LOGIN }
@@ -97,23 +97,20 @@ private fun UserForm(
             style = MaterialTheme.typography.titleLarge
         )
 
-        OutlinedTextField(
+        InputTextField(
             value = username,
             onValueChange = {
                 username = it
                 error = null
             },
-            label = { Text("Username") },
+            label = "Username",
             isError = error != null,
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         if (error != null) {
-            Text(error!!, color = MaterialTheme.colorScheme.error)
+            Text(error!!, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
         }
-
-        Spacer(Modifier.height(15.dp))
 
         Button(
             onClick = {
@@ -123,7 +120,7 @@ private fun UserForm(
                 })
             }, enabled = username.trim().isNotEmpty(), modifier = Modifier.fillMaxWidth()
         ) {
-            Text(actionText)
+            Text(actionText, style = MaterialTheme.typography.bodyMedium,   )
         }
     }
 }
