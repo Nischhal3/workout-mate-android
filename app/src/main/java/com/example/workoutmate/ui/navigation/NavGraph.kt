@@ -2,13 +2,13 @@ package com.example.workoutmate.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.workoutmate.ui.screen.dashboard.Dashboard
 import com.example.workoutmate.ui.screen.Home
 import com.example.workoutmate.ui.viewmodel.UserViewModel
-
 
 object Routes {
     const val HOME = "home"
@@ -17,8 +17,10 @@ object Routes {
 
 @Composable
 fun NavGraph(
-    navController: NavHostController, userViewModel: UserViewModel, modifier: Modifier = Modifier
+    navController: NavHostController, modifier: Modifier = Modifier
 ) {
+    val userViewModel: UserViewModel = viewModel()
+
     NavHost(
         navController = navController, startDestination = Routes.HOME, modifier = modifier
     ) {
@@ -32,7 +34,7 @@ fun NavGraph(
         }
 
         composable(Routes.DASHBOARD) {
-            Dashboard()
+            Dashboard(userViewModel)
         }
     }
 }

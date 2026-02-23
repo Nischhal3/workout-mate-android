@@ -1,49 +1,59 @@
 package com.example.workoutmate.ui.screen.dashboard
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.workoutmate.ui.screen.components.DatePickerDialog
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.example.workoutmate.ui.screen.dashboard.components.DashboardHeader
+import com.example.workoutmate.ui.screen.dashboard.components.DashboardNavBar
+import com.example.workoutmate.ui.screen.dashboard.components.ExerciseList
+import com.example.workoutmate.ui.screen.dashboard.components.workoutform.WorkoutForm
+import com.example.workoutmate.ui.theme.LightGreen
+import com.example.workoutmate.ui.theme.LightSage
+import com.example.workoutmate.ui.theme.White
+import com.example.workoutmate.ui.viewmodel.UserViewModel
 
 @Composable
-fun Dashboard() {
+fun Dashboard(userViewModel: UserViewModel) {
+    val currentUser by userViewModel.currentUser.collectAsState()
+
     var openDialog by remember { mutableStateOf(false) }
-    var selectedDateLabel by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Button(onClick = { openDialog = true }) {
-            Text("Open Date Picker")
+    Scaffold(
+        containerColor = White, bottomBar = {
+            DashboardNavBar(onHomeClick = { }, onAddClick = { openDialog = true })
+        }) { _ ->
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            DashboardHeader(
+                onProfileClick = { },
+                onSettingsClick = { },
+                username = currentUser?.username ?: "Not logged in",
+            )
+
+            HorizontalDivider(color = LightSage)
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(LightGreen)
+            ) {
+                ExerciseList()
+            }
         }
-
-        Text("Selected Date: $selectedDateLabel")
     }
 
-    DatePickerDialog(
-        open = openDialog,
-        onDismiss = { openDialog = false },
-        disablePastDates = true,
-        onDateSelected = { date ->
-            selectedDateLabel = date.toPrettyDateString()
-        }
-    )
-}
-
-fun LocalDate.toPrettyDateString(): String {
-    val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
-    return this.format(formatter)
+    if (openDialog) {
+        WorkoutForm(onBackClick = { openDialog = false })
+    }
 }

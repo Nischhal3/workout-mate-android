@@ -2,28 +2,15 @@ package com.example.workoutmate.data.repository
 
 import android.content.Context
 import com.example.workoutmate.data.User
-import com.example.workoutmate.data.dao.UserDao
 import com.example.workoutmate.data.db.AppDatabase
 
-class UserRepository private constructor(
-    private val userDao: UserDao
+class UserRepository(
+    context: Context,
 ) {
-    companion object {
-        @Volatile
-        private var INSTANCE: UserRepository? = null
+    private val userDao = AppDatabase.get(context.applicationContext).userDao()
 
-        fun getInstance(context: Context): UserRepository {
-            return INSTANCE ?: synchronized(this) {
-                val database = AppDatabase.get(context)
-                val instance = UserRepository(database.userDao())
-                INSTANCE = instance
-                instance
-            }
-        }
-    }
-
-    suspend fun usernameExists(username: String): Boolean {
-        return userDao.usernameExists(username.trim())
+    suspend fun getUserByUsername(username: String): User? {
+        return userDao.getUserByUsername(username.trim())
     }
 
     suspend fun createUser(username: String): Long {

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -41,9 +42,19 @@ android {
     buildFeatures {
         compose = true
     }
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+
     // Room db
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
@@ -53,6 +64,8 @@ dependencies {
 
     // Room Code Generator
     ksp(libs.room.compiler)
+
+    implementation(libs.material.icons.extended)
 
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
