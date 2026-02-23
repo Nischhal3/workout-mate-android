@@ -24,7 +24,7 @@ import com.example.workoutmate.ui.viewmodel.UserViewModel
 
 @Composable
 fun Dashboard(userViewModel: UserViewModel) {
-    val username by userViewModel.username.collectAsState()
+    val currentUser by userViewModel.currentUser.collectAsState()
 
     var openDialog by remember { mutableStateOf(false) }
 
@@ -38,7 +38,7 @@ fun Dashboard(userViewModel: UserViewModel) {
             DashboardHeader(
                 onProfileClick = { },
                 onSettingsClick = { },
-                username = username ?: "Not logged in",
+                username = currentUser?.username ?: "Not logged in",
             )
 
             HorizontalDivider(color = LightSage)

@@ -9,8 +9,8 @@ class UserRepository(
 ) {
     private val userDao = AppDatabase.get(context.applicationContext).userDao()
 
-    suspend fun usernameExists(username: String): Boolean {
-        return userDao.usernameExists(username.trim())
+    suspend fun getUserByUsername(username: String): User? {
+        return userDao.getUserByUsername(username.trim())
     }
 
     suspend fun createUser(username: String): Long {
