@@ -19,7 +19,7 @@ import com.example.workoutmate.ui.theme.Green
 import com.example.workoutmate.ui.theme.LightGray
 
 @Composable
-fun WorkoutCardHeader(
+fun Header(
     workoutTitle: String, onBackClick: () -> Unit, onSaveClick: () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
