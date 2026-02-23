@@ -35,18 +35,19 @@ import com.example.workoutmate.ui.theme.DarkGray
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
+import com.example.workoutmate.ui.viewmodel.UserViewModel
+import com.example.workoutmate.utils.toPrettyDateString
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun WorkoutForm(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit, userViewModel: UserViewModel
 ) {
     var workoutTitle by remember { mutableStateOf("") }
     var showSetForm by remember { mutableStateOf(false) }
     var openDatePicker by remember { mutableStateOf(false) }
     var exercises by remember { mutableStateOf(listOf<ExerciseSet>()) }
-    var selectedDate by remember { mutableStateOf(LocalDate.now().toPrettyDateString()) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     Surface(
         modifier = Modifier
@@ -89,13 +90,20 @@ fun WorkoutForm(
                 ) {
 
                     Header(
-                        workoutTitle = workoutTitle,
-                        onBackClick = onBackClick,
-                        onSaveClick = { /* handle save */ })
+                        workoutTitle = workoutTitle, onBackClick = onBackClick, onSaveClick = {
+                            userViewModel.addWorkoutSession(
+                                title = workoutTitle,
+                                date = selectedDate,
+                                onError = { message ->
+                                },
+                                onSuccess = {
+                                    onBackClick()
+                                })
+                        })
 
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Selected date: $selectedDate",
+                            text = "Selected date: ${selectedDate.toPrettyDateString()}",
                             color = DarkGray,
                             fontSize = 14.sp,
                             modifier = Modifier.padding(start = 8.dp, top = 4.dp)
@@ -138,12 +146,7 @@ fun WorkoutForm(
                 open = openDatePicker,
                 disablePastDates = true,
                 onDismiss = { openDatePicker = false },
-                onDateSelected = { date -> selectedDate = date.toPrettyDateString() })
+                onDateSelected = { date -> selectedDate = date })
         }
     }
-}
-
-fun LocalDate.toPrettyDateString(): String {
-    val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
-    return this.format(formatter)
 }

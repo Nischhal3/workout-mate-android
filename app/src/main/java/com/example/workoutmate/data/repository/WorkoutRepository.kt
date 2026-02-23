@@ -19,6 +19,8 @@ class WorkoutRepository(
     private val exerciseDao = db.workoutExerciseDao()
 
     // ---------------- READ ----------------
+    fun observeSessionsForUser(userId: Long) = sessionDao.observeSessionsForUser(userId)
+
     fun observeSession(sessionId: Long) = detailsDao.observeSessionWithExercisesAndSets(sessionId)
 
     // ---------------- CREATE ----------------

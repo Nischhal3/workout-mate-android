@@ -4,13 +4,15 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workoutmate.data.User
+import com.example.workoutmate.data.WorkoutSession
 import com.example.workoutmate.data.repository.UserRepository
 import com.example.workoutmate.data.repository.WorkoutRepository
-import com.example.workoutmate.utils.LogType
 import com.example.workoutmate.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 private const val TAG = "UserViewModel"
 
@@ -20,6 +22,13 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser
+
+    private val _workoutSessions = MutableStateFlow<List<WorkoutSession>>(emptyList())
+    val workoutSessions: StateFlow<List<WorkoutSession>> = _workoutSessions
+
+    init {
+        observeWorkoutSessions()
+    }
 
     fun createUser(
         username: String, onError: (String) -> Unit, onSuccess: () -> Unit
@@ -34,7 +43,6 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             val existingUser = userRepository.getUserByUsername(trimmed)
             if (existingUser != null) {
                 onError("User already exists")
-                Logger(TAG, "User already exists.", LogType.ERROR)
             } else {
                 userRepository.createUser(trimmed)
                 Logger(TAG, "Created user with username: $username.")
@@ -60,6 +68,39 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 onSuccess()
             } else {
                 onError("User not found. Create user first.")
+            }
+        }
+    }
+
+    fun addWorkoutSession(
+        title: String, date: LocalDate, onError: (String) -> Unit, onSuccess: () -> Unit
+    ) {
+        val userId = currentUser.value?.id ?: return
+
+        val trimmedTitle = title.trim()
+        if (trimmedTitle.isEmpty()) return
+
+        viewModelScope.launch {
+            try {
+                workoutRepository.createSession(userId, trimmedTitle, date)
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e.message ?: "Failed to save workout")
+            }
+        }
+    }
+
+    private fun observeWorkoutSessions() {
+        viewModelScope.launch {
+            currentUser.collectLatest { user ->
+                if (user == null) {
+                    _workoutSessions.value = emptyList()
+                    return@collectLatest
+                }
+
+                workoutRepository.observeSessionsForUser(user.id).collectLatest { sessions ->
+                    _workoutSessions.value = sessions
+                }
             }
         }
     }

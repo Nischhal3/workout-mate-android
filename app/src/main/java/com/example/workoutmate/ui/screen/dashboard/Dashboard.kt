@@ -18,8 +18,8 @@ import androidx.navigation.NavController
 import com.example.workoutmate.ui.navigation.Routes
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardHeader
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardNavBar
-import com.example.workoutmate.ui.screen.dashboard.components.ExerciseList
 import com.example.workoutmate.ui.screen.dashboard.components.workoutform.WorkoutForm
+import com.example.workoutmate.ui.screen.dashboard.components.workoutsessions.WorkoutSessionList
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.White
@@ -60,12 +60,12 @@ fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
                     .weight(1f)
                     .background(LightGreen)
             ) {
-                ExerciseList()
+                WorkoutSessionList(userViewModel)
             }
         }
     }
 
     if (openDialog) {
-        WorkoutForm(onBackClick = { openDialog = false })
+        WorkoutForm(userViewModel = userViewModel, onBackClick = { openDialog = false })
     }
 }

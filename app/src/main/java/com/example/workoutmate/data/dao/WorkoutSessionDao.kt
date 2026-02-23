@@ -18,6 +18,9 @@ interface WorkoutSessionDao {
     @Update
     suspend fun update(session: WorkoutSession)
 
+    @Query("SELECT * FROM workout_sessions WHERE userId = :userId ORDER BY date DESC, id DESC")
+    fun observeSessionsForUser(userId: Long): Flow<List<WorkoutSession>>
+
     @Query("DELETE FROM workout_sessions WHERE id = :sessionId")
     suspend fun deleteById(sessionId: Long)
 
