@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import com.example.workoutmate.ui.navigation.Routes
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardHeader
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardNavBar
 import com.example.workoutmate.ui.screen.dashboard.components.ExerciseList
@@ -23,8 +26,17 @@ import com.example.workoutmate.ui.theme.White
 import com.example.workoutmate.ui.viewmodel.UserViewModel
 
 @Composable
-fun Dashboard(userViewModel: UserViewModel) {
+fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
     val currentUser by userViewModel.currentUser.collectAsState()
+
+    LaunchedEffect(currentUser) {
+        if (currentUser == null) {
+            navController.navigate(Routes.HOME) {
+                popUpTo(Routes.DASHBOARD) { inclusive = true }
+            }
+        }
+    }
+    if (currentUser == null) return
 
     var openDialog by remember { mutableStateOf(false) }
 
@@ -38,7 +50,7 @@ fun Dashboard(userViewModel: UserViewModel) {
             DashboardHeader(
                 onProfileClick = { },
                 onSettingsClick = { },
-                username = currentUser?.username ?: "Not logged in",
+                username = currentUser!!.username
             )
 
             HorizontalDivider(color = LightSage)

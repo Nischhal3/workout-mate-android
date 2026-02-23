@@ -34,7 +34,7 @@ fun NavGraph(
         }
 
         composable(Routes.DASHBOARD) {
-            Dashboard(userViewModel)
+            Dashboard(userViewModel, navController)
         }
     }
 }
