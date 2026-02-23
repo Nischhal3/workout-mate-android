@@ -2,15 +2,24 @@ package com.example.workoutmate.ui.screen
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.workoutmate.ui.screen.components.FlipCard
 import com.example.workoutmate.ui.viewmodel.UserViewModel
@@ -35,7 +44,6 @@ fun Home(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("WorkoutMate", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(Modifier.height(8.dp))
 
@@ -85,9 +93,8 @@ private fun UserForm(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
+            style = MaterialTheme.typography.titleLarge
         )
 
         OutlinedTextField(

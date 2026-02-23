@@ -66,6 +66,7 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.material.icons.extended)
+    implementation(libs.compose.ui.text.google.fonts)
 
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
