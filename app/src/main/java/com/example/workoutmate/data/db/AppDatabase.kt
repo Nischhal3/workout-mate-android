@@ -24,10 +24,10 @@ import com.example.workoutmate.data.dao.WorkoutSetDao
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
-    abstract fun workoutSessionDao(): WorkoutSessionDao
-    abstract fun workoutExerciseDao(): WorkoutExerciseDao
     abstract fun workoutSetDao(): WorkoutSetDao
+    abstract fun workoutSessionDao(): WorkoutSessionDao
     abstract fun workoutDetailsDao(): WorkoutDetailsDao
+    abstract fun workoutExerciseDao(): WorkoutExerciseDao
 
     companion object {
         @Volatile

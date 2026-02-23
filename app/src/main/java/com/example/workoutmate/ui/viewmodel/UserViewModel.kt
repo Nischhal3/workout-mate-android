@@ -4,12 +4,14 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workoutmate.data.repository.UserRepository
+import com.example.workoutmate.data.repository.WorkoutRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
-    private val userRepository = UserRepository.getInstance(application)
+    private val userRepository = UserRepository(application)
+    private val workoutRepository = WorkoutRepository(application)
 
     private val _username = MutableStateFlow<String?>(null)
     val username: StateFlow<String?> = _username
