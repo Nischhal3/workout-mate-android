@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,11 +28,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.workoutmate.data.WorkoutDay
 import com.example.workoutmate.ui.screen.components.VerticalScrollbar
 import com.example.workoutmate.ui.theme.DarkGray
 import com.example.workoutmate.ui.theme.DarkGreen
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -41,66 +38,7 @@ import java.util.Locale
 @Composable
 fun ExerciseList() {
     val listState = rememberLazyListState()
-    val dummyWorkoutDays = listOf(
 
-        WorkoutDay(
-            workoutDayId = 1,
-            userId = 1,
-            title = "Chest Day",
-            date = LocalDate.now(),
-            notes = "Focused on incline press",
-        ),
-
-        WorkoutDay(
-            workoutDayId = 2,
-            userId = 1,
-            title = "Leg Day",
-            date = LocalDate.now().minusDays(1),
-            notes = "Heavy squats",
-        ),
-
-        WorkoutDay(
-            workoutDayId = 3,
-            userId = 1,
-            title = "Back Workout",
-            date = LocalDate.now().minusDays(2),
-            notes = "Deadlifts & rows",
-        ),
-
-        WorkoutDay(
-            workoutDayId = 4,
-            userId = 1,
-            title = "Shoulders",
-            date = LocalDate.now().minusDays(3),
-            notes = null,
-        ),
-
-        WorkoutDay(
-            workoutDayId = 5,
-            userId = 1,
-            title = "Arms",
-            date = LocalDate.now().minusDays(4),
-            notes = "Biceps + Triceps",
-        ), WorkoutDay(
-            workoutDayId = 6,
-            userId = 1,
-            title = "Arms",
-            date = LocalDate.now().minusDays(4),
-            notes = "TEst + Triceps",
-        ), WorkoutDay(
-            workoutDayId = 7,
-            userId = 1,
-            title = "Arms",
-            date = LocalDate.now().minusDays(4),
-            notes = "TEst + Triceps",
-        ), WorkoutDay(
-            workoutDayId = 8,
-            userId = 1,
-            title = "Arms",
-            date = LocalDate.now().minusDays(4),
-            notes = "TEst + Triceps",
-        )
-    )
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -113,9 +51,9 @@ fun ExerciseList() {
             contentPadding = PaddingValues(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(dummyWorkoutDays) { day ->
-                ExerciseCard(day)
-            }
+//            items([]) { day ->
+//                ExerciseCard(day)
+//            }
         }
 
         VerticalScrollbar(
@@ -126,84 +64,84 @@ fun ExerciseList() {
     }
 }
 
-@Composable
-fun ExerciseCard(day: WorkoutDay) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Column(
-                modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    Text(
-                        text = day.title,
-                        fontSize = 18.sp,
-                        color = DarkGreen,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    Text(
-                        text = day.date.format(
-                            DateTimeFormatter.ofPattern(
-                                "dd MMM yyyy", Locale.getDefault()
-                            )
-                        ), fontSize = 14.sp, color = DarkGray
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    if (day.notes != null) {
-                        Text(
-                            text = day.notes,
-                            fontSize = 12.sp,
-                            color = DarkGreen,
-                            modifier = Modifier.weight(1f)
-                        )
-                    } else {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-
-                    Text(
-                        text = day.date.dayOfWeek.getDisplayName(
-                            TextStyle.FULL, Locale.getDefault()
-                        ), fontSize = 12.sp, color = DarkGray
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = DarkGreen,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
-}
+//@Composable
+//fun ExerciseCard(day: WorkoutDay) {
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .height(100.dp),
+//        shape = RoundedCornerShape(16.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color.White),
+//        elevation = CardDefaults.cardElevation(4.dp)
+//    ) {
+//
+//        Row(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//
+//            Column(
+//                modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//
+//                    Text(
+//                        text = day.title,
+//                        fontSize = 18.sp,
+//                        color = DarkGreen,
+//                        fontWeight = FontWeight.Bold,
+//                    )
+//
+//                    Text(
+//                        text = day.date.format(
+//                            DateTimeFormatter.ofPattern(
+//                                "dd MMM yyyy", Locale.getDefault()
+//                            )
+//                        ), fontSize = 14.sp, color = DarkGray
+//                    )
+//                }
+//
+//                Spacer(modifier = Modifier.height(4.dp))
+//
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//
+//                    if (day.notes != null) {
+//                        Text(
+//                            text = day.notes,
+//                            fontSize = 12.sp,
+//                            color = DarkGreen,
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                    } else {
+//                        Spacer(modifier = Modifier.weight(1f))
+//                    }
+//
+//                    Text(
+//                        text = day.date.dayOfWeek.getDisplayName(
+//                            TextStyle.FULL, Locale.getDefault()
+//                        ), fontSize = 12.sp, color = DarkGray
+//                    )
+//                }
+//            }
+//
+//            Spacer(modifier = Modifier.width(8.dp))
+//
+//            Icon(
+//                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+//                contentDescription = null,
+//                tint = DarkGreen,
+//                modifier = Modifier.size(24.dp)
+//            )
+//        }
+//    }
+//}

@@ -9,95 +9,76 @@ import androidx.room.Relation
 import java.time.LocalDate
 
 @Entity(
-    tableName = "users",
-    indices = [Index(value = ["username"], unique = true)]
+    tableName = "users", indices = [Index(value = ["username"], unique = true)]
 )
 data class User(
-    @PrimaryKey(autoGenerate = true) val userId: Long = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val username: String,
-    val createdAtEpochMs: Long = System.currentTimeMillis()
+    val createdAtMs: Long = System.currentTimeMillis()
 )
 
 @Entity(
-    tableName = "workout_days",
-    foreignKeys = [
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["userId"],
-            childColumns = ["userId"],
-            onDelete = ForeignKey.Companion.CASCADE
-        )
-    ],
-    indices = [
-        Index("userId"),
-        Index(value = ["userId", "date", "title"])
-    ]
+    tableName = "workout_sessions", foreignKeys = [ForeignKey(
+        entity = User::class,
+        parentColumns = ["id"],
+        childColumns = ["userId"],
+        onDelete = ForeignKey.CASCADE
+    )], indices = [Index("userId"), Index(value = ["userId", "date", "title"], unique = true)]
 )
-data class WorkoutDay(
-    @PrimaryKey(autoGenerate = true) val workoutDayId: Long = 0,
+data class WorkoutSession(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val userId: Long,
     val title: String,
     val date: LocalDate,
-    val notes: String? = null,
+    val notes: String? = null
 )
 
 @Entity(
-    tableName = "exercise_entries",
-    foreignKeys = [
-        ForeignKey(
-            entity = WorkoutDay::class,
-            parentColumns = ["workoutDayId"],
-            childColumns = ["workoutDayId"],
-            onDelete = ForeignKey.Companion.CASCADE
-        )
-    ],
-    indices = [Index("workoutDayId")]
+    tableName = "workout_exercises", foreignKeys = [ForeignKey(
+        entity = WorkoutSession::class,
+        parentColumns = ["id"],
+        childColumns = ["sessionId"],
+        onDelete = ForeignKey.CASCADE
+    )], indices = [Index("sessionId"), Index(value = ["sessionId", "orderIndex"])]
 )
-data class ExerciseEntry(
-    @PrimaryKey(autoGenerate = true) val exerciseEntryId: Long = 0,
-    val workoutDayId: Long,
+data class WorkoutExercise(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val sessionId: Long,
     val name: String,
     val orderIndex: Int = 0,
-    val note: String? = null
+    val notes: String? = null
 )
 
 @Entity(
-    tableName = "set_entries",
-    foreignKeys = [
-        ForeignKey(
-            entity = ExerciseEntry::class,
-            parentColumns = ["exerciseEntryId"],
-            childColumns = ["exerciseEntryId"],
-            onDelete = ForeignKey.Companion.CASCADE
-        )
-    ],
-    indices = [Index("exerciseEntryId")]
+    tableName = "workout_sets", foreignKeys = [ForeignKey(
+        entity = WorkoutExercise::class,
+        parentColumns = ["id"],
+        childColumns = ["exerciseId"],
+        onDelete = ForeignKey.CASCADE
+    )], indices = [Index("exerciseId"), Index(value = ["exerciseId", "setNumber"], unique = true)]
 )
-data class SetEntry(
-    @PrimaryKey(autoGenerate = true) val setEntryId: Long = 0,
-    val exerciseEntryId: Long,
+data class WorkoutSet(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val exerciseId: Long,
     val setNumber: Int,
     val weightKg: Double,
     val reps: Int,
-    val isCompleted: Boolean = true,
-    val createdAtEpochMs: Long = System.currentTimeMillis()
+    val completed: Boolean = false,
+    val createdAtMs: Long = System.currentTimeMillis()
 )
 
-data class ExerciseWithSets(
-    @Embedded val exercise: ExerciseEntry,
-    @Relation(
-        parentColumn = "exerciseEntryId",
-        entityColumn = "exerciseEntryId"
-    )
-    val sets: List<SetEntry>
+/**
+ * Relation models for UI: WorkoutSession -> WorkoutExercise -> WorkoutSet
+ * (These are NOT tables, just query results.)
+ */
+data class WorkoutExerciseWithSets(
+    @Embedded val exercise: WorkoutExercise, @Relation(
+        parentColumn = "id", entityColumn = "exerciseId"
+    ) val sets: List<WorkoutSet>
 )
 
-data class WorkoutDayWithExercisesAndSets(
-    @Embedded val workoutDay: WorkoutDay,
-    @Relation(
-        entity = ExerciseEntry::class,
-        parentColumn = "workoutDayId",
-        entityColumn = "workoutDayId"
-    )
-    val exercises: List<ExerciseWithSets>
+data class WorkoutSessionWithExercisesAndSets(
+    @Embedded val session: WorkoutSession, @Relation(
+        entity = WorkoutExercise::class, parentColumn = "id", entityColumn = "sessionId"
+    ) val exercises: List<WorkoutExerciseWithSets>
 )
