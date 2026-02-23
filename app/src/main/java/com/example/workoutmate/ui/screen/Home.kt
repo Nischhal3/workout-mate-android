@@ -2,17 +2,25 @@ package com.example.workoutmate.ui.screen
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.workoutmate.ui.screen.components.AppButton
 import com.example.workoutmate.ui.screen.components.FlipCard
+import com.example.workoutmate.ui.screen.components.InputTextField
 import com.example.workoutmate.ui.viewmodel.UserViewModel
 
 private enum class CardSide { CREATE, LOGIN }
@@ -35,7 +43,6 @@ fun Home(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("WorkoutMate", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(Modifier.height(8.dp))
 
@@ -59,13 +66,13 @@ fun Home(
             )
         })
 
-        OutlinedButton(
+        AppButton(
+            modifier = Modifier.fillMaxWidth(),
+            text = if (side == CardSide.CREATE) "Go to Login" else "Go to Create",
             onClick = {
                 side = if (side == CardSide.CREATE) CardSide.LOGIN else CardSide.CREATE
-            }, modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(if (side == CardSide.CREATE) "Go to Login" else "Go to Create")
-        }
+            },
+        )
     }
 }
 
@@ -85,38 +92,39 @@ private fun UserForm(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
+            style = MaterialTheme.typography.titleLarge
         )
 
-        OutlinedTextField(
+        InputTextField(
             value = username,
             onValueChange = {
                 username = it
                 error = null
             },
-            label = { Text("Username") },
+            label = "Username",
             isError = error != null,
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         if (error != null) {
-            Text(error!!, color = MaterialTheme.colorScheme.error)
+            Text(
+                error!!,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error
+            )
         }
 
-        Spacer(Modifier.height(15.dp))
-
-        Button(
+        AppButton(
+            text = actionText,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = username.trim().isNotEmpty(),
             onClick = {
                 onSubmit(username.trim(), { msg -> error = msg }, {
                     error = null
                     onSuccess()
                 })
-            }, enabled = username.trim().isNotEmpty(), modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(actionText)
-        }
+            },
+        )
     }
 }

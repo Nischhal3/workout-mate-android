@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -19,7 +18,6 @@ import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -136,34 +134,30 @@ fun DatePickerDialog(
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                         .offset(y = (-14).dp), horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    OutlinedButton(
+
+                    AppButton(
+                        text = "CANCEL",
                         onClick = onDismiss,
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Green),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Green),
                         modifier = Modifier
                             .weight(1f)
-                            .height(48.dp)
-                    ) {
-                        Text("CANCEL")
-                    }
+                            .height(48.dp),
+                        border = BorderStroke(1.dp, Green),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Green, containerColor = White
+                        )
+                    )
 
-                    Button(
+                    AppButton(
+                        text = "Ok",
                         onClick = {
                             val ms = datePickerState.selectedDateMillis
                             if (ms != null) onDateSelected(utcMillisToLocalDate(ms))
                             onDismiss()
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Green, contentColor = White
-                        ),
-                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .weight(1f)
-                            .height(48.dp)
-                    ) {
-                        Text("OK")
-                    }
+                            .height(48.dp),
+                    )
                 }
             }
         }
