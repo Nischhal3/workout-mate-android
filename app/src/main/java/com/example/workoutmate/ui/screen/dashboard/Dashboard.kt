@@ -20,8 +20,8 @@ import com.example.workoutmate.ui.navigation.Routes
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardHeader
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardNavBar
 import com.example.workoutmate.ui.screen.dashboard.components.workoutform.WorkoutForm
-import com.example.workoutmate.ui.screen.dashboard.components.workoutsessions.WorkoutSessionList
-import com.example.workoutmate.ui.screen.dashboard.components.workoutsessions.details.WorkoutExerciseDetails
+import com.example.workoutmate.ui.screen.dashboard.components.sessions.SessionList
+import com.example.workoutmate.ui.screen.dashboard.components.sessions.details.Session
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.White
@@ -30,7 +30,7 @@ import com.example.workoutmate.ui.viewmodel.UserViewModel
 @Composable
 fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
     val currentUser by userViewModel.currentUser.collectAsState()
-    val selectedWorkoutSession by userViewModel.selectedWorkoutSession.collectAsState()
+    val selectedWorkoutSession by userViewModel.selectedSession.collectAsState()
 
     LaunchedEffect(currentUser) {
         if (currentUser == null) {
@@ -68,9 +68,9 @@ fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
                     .background(LightGreen)
             ) {
                 if (selectedWorkoutSession == null) {
-                    WorkoutSessionList(userViewModel)
+                    SessionList(userViewModel)
                 } else {
-                    WorkoutExerciseDetails(
+                    Session(
                         userViewModel = userViewModel,
                         data = selectedWorkoutSession!!,
                         onBackClick = { userViewModel.clearSelectedWorkoutSession() })

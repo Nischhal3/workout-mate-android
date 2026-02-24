@@ -26,12 +26,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser
 
-    private val _workoutSessions = MutableStateFlow<List<WorkoutSession>>(emptyList())
-    val workoutSessions: StateFlow<List<WorkoutSession>> = _workoutSessions
+    private val _sessions = MutableStateFlow<List<WorkoutSession>>(emptyList())
+    val sessions: StateFlow<List<WorkoutSession>> = _sessions
 
-    private val _selectedWorkoutSession = MutableStateFlow<WorkoutSessionWithExercisesAndSets?>(null)
+    private val _selectedSession = MutableStateFlow<WorkoutSessionWithExercisesAndSets?>(null)
 
-    val selectedWorkoutSession: StateFlow<WorkoutSessionWithExercisesAndSets?> = _selectedWorkoutSession
+    val selectedSession: StateFlow<WorkoutSessionWithExercisesAndSets?> = _selectedSession
 
     init {
         observeWorkoutSessions()
@@ -127,12 +127,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             currentUser.collectLatest { user ->
                 if (user == null) {
-                    _workoutSessions.value = emptyList()
+                    _sessions.value = emptyList()
                     return@collectLatest
                 }
 
                 workoutRepository.observeSessionsForUser(user.id).collectLatest { sessions ->
-                    _workoutSessions.value = sessions
+                    _sessions.value = sessions
                 }
             }
         }
@@ -143,19 +143,19 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
             val user = currentUser.value
             if (user == null) {
-                _selectedWorkoutSession.value = null
+                _selectedSession.value = null
                 return@launch
             }
 
             workoutRepository.observeSessionWithExercisesAndSets(
                 userId = user.id, sessionId = workoutSessionId
             ).distinctUntilChanged().collectLatest { state ->
-                _selectedWorkoutSession.value = state
+                _selectedSession.value = state
             }
         }
     }
 
     fun clearSelectedWorkoutSession() {
-        _selectedWorkoutSession.value = null
+        _selectedSession.value = null
     }
 }

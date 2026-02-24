@@ -1,4 +1,4 @@
-package com.example.workoutmate.ui.screen.dashboard.components.workoutsessions
+package com.example.workoutmate.ui.screen.dashboard.components.sessions
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +32,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
-fun WorkoutSessionItem(
+fun SessionItem(
     session: WorkoutSession,
     userViewModel: UserViewModel,
     onCopyClick: (WorkoutSession) -> Unit = {}

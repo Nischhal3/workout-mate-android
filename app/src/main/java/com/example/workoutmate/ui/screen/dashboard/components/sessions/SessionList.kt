@@ -1,4 +1,4 @@
-package com.example.workoutmate.ui.screen.dashboard.components.workoutsessions
+package com.example.workoutmate.ui.screen.dashboard.components.sessions
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,9 +25,9 @@ import com.example.workoutmate.ui.viewmodel.UserViewModel
 import com.example.workoutmate.utils.toPrettyDateString
 
 @Composable
-fun WorkoutSessionList(userViewModel: UserViewModel) {
+fun SessionList(userViewModel: UserViewModel) {
     val listState = rememberLazyListState()
-    val workoutSessions by userViewModel.workoutSessions.collectAsState()
+    val workoutSessions by userViewModel.sessions.collectAsState()
 
     val groupedSessions = remember(workoutSessions) {
         workoutSessions.groupBy { it.date }
@@ -70,7 +70,7 @@ fun WorkoutSessionList(userViewModel: UserViewModel) {
 
                 items(
                     items = sessionsForDate, key = { it.id }) { session ->
-                    WorkoutSessionItem(session = session, userViewModel = userViewModel)
+                    SessionItem(session = session, userViewModel = userViewModel)
                 }
             }
         }
