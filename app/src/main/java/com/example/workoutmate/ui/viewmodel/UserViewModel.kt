@@ -29,9 +29,9 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val _workoutSessions = MutableStateFlow<List<WorkoutSession>>(emptyList())
     val workoutSessions: StateFlow<List<WorkoutSession>> = _workoutSessions
 
-    private val _selectedSession = MutableStateFlow<WorkoutSessionWithExercisesAndSets?>(null)
+    private val _selectedWorkoutSession = MutableStateFlow<WorkoutSessionWithExercisesAndSets?>(null)
 
-    val selectedSession: StateFlow<WorkoutSessionWithExercisesAndSets?> = _selectedSession
+    val selectedWorkoutSession: StateFlow<WorkoutSessionWithExercisesAndSets?> = _selectedWorkoutSession
 
     init {
         observeWorkoutSessions()
@@ -143,15 +143,19 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
             val user = currentUser.value
             if (user == null) {
-                _selectedSession.value = null
+                _selectedWorkoutSession.value = null
                 return@launch
             }
 
             workoutRepository.observeSessionWithExercisesAndSets(
                 userId = user.id, sessionId = workoutSessionId
             ).distinctUntilChanged().collectLatest { state ->
-                _selectedSession.value = state
+                _selectedWorkoutSession.value = state
             }
         }
+    }
+
+    fun clearSelectedWorkoutSession() {
+        _selectedWorkoutSession.value = null
     }
 }

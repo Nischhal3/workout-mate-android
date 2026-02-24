@@ -25,3 +25,5 @@ val LightSage = Color(0xFFB8D2BA)
 val DarkGray = Color(0xFF444444)
 
 val LightGray = Color(0xFFCCCCCC)
+
+val Red = Color(0xFFFF0000)

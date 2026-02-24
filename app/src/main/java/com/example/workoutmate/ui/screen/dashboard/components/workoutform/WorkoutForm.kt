@@ -12,9 +12,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.workoutmate.ui.screen.components.DatePickerDialog
+import com.example.workoutmate.ui.screen.components.Header
 import com.example.workoutmate.ui.screen.components.InputTextField
 import com.example.workoutmate.ui.screen.components.roundedTopBar
 import com.example.workoutmate.ui.theme.DarkGray
@@ -90,7 +96,12 @@ fun WorkoutForm(
                 ) {
 
                     Header(
-                        workoutTitle = workoutTitle, onBackClick = onBackClick, onSaveClick = {
+                        title = "Add Workout",
+                        onLeftClick = onBackClick,
+                        rightIcon = Icons.Filled.Save,
+                        rightIconEnabled = workoutTitle.isNotEmpty(),
+                        leftIcon = Icons.AutoMirrored.Filled.ArrowBack,
+                        onRightClick = {
                             userViewModel.addWorkoutSession(
                                 title = workoutTitle,
                                 date = selectedDate,

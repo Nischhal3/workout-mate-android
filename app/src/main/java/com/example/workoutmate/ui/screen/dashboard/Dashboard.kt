@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import com.example.workoutmate.ui.screen.dashboard.components.DashboardHeader
 import com.example.workoutmate.ui.screen.dashboard.components.DashboardNavBar
 import com.example.workoutmate.ui.screen.dashboard.components.workoutform.WorkoutForm
 import com.example.workoutmate.ui.screen.dashboard.components.workoutsessions.WorkoutSessionList
+import com.example.workoutmate.ui.screen.dashboard.components.workoutsessions.details.WorkoutExerciseDetails
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.White
@@ -28,6 +30,7 @@ import com.example.workoutmate.ui.viewmodel.UserViewModel
 @Composable
 fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
     val currentUser by userViewModel.currentUser.collectAsState()
+    val selectedWorkoutSession by userViewModel.selectedWorkoutSession.collectAsState()
 
     LaunchedEffect(currentUser) {
         if (currentUser == null) {
@@ -42,10 +45,14 @@ fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
 
     Scaffold(
         containerColor = White, bottomBar = {
-            DashboardNavBar(onHomeClick = { }, onAddClick = { openDialog = true })
-        }) { _ ->
+            DashboardNavBar(onHomeClick = {
+                userViewModel.clearSelectedWorkoutSession()
+            }, onAddClick = { openDialog = true })
+        }) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
             DashboardHeader(
                 onProfileClick = { },
@@ -60,12 +67,19 @@ fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
                     .weight(1f)
                     .background(LightGreen)
             ) {
-                WorkoutSessionList(userViewModel)
+                if (selectedWorkoutSession == null) {
+                    WorkoutSessionList(userViewModel)
+                } else {
+                    WorkoutExerciseDetails(
+                        userViewModel = userViewModel,
+                        data = selectedWorkoutSession!!,
+                        onBackClick = { userViewModel.clearSelectedWorkoutSession() })
+                }
             }
         }
     }
 
     if (openDialog) {
-        WorkoutForm( userViewModel = userViewModel, onBackClick = { openDialog = false })
+        WorkoutForm(userViewModel = userViewModel, onBackClick = { openDialog = false })
     }
 }
