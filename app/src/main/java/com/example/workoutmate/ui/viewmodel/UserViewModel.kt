@@ -5,12 +5,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workoutmate.data.User
 import com.example.workoutmate.data.WorkoutSession
+import com.example.workoutmate.data.WorkoutSessionWithExercisesAndSets
 import com.example.workoutmate.data.repository.UserRepository
 import com.example.workoutmate.data.repository.WorkoutRepository
+import com.example.workoutmate.ui.screen.dashboard.components.workoutform.Exercise
 import com.example.workoutmate.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -25,6 +28,10 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _workoutSessions = MutableStateFlow<List<WorkoutSession>>(emptyList())
     val workoutSessions: StateFlow<List<WorkoutSession>> = _workoutSessions
+
+    private val _selectedSession = MutableStateFlow<WorkoutSessionWithExercisesAndSets?>(null)
+
+    val selectedSession: StateFlow<WorkoutSessionWithExercisesAndSets?> = _selectedSession
 
     init {
         observeWorkoutSessions()
@@ -73,7 +80,11 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun addWorkoutSession(
-        title: String, date: LocalDate, onError: (String) -> Unit, onSuccess: () -> Unit
+        title: String,
+        date: LocalDate,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+        exercises: List<Exercise>
     ) {
         val userId = currentUser.value?.id ?: return
 
@@ -82,7 +93,29 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                workoutRepository.createSession(userId, trimmedTitle, date)
+                val workoutSessionId = workoutRepository.createSession(userId, trimmedTitle, date)
+                if (exercises.isEmpty()) {
+                    onSuccess()
+                    return@launch
+                }
+
+                exercises.forEach { exerciseSet ->
+                    val exerciseId = workoutRepository.addExercise(
+                        sessionId = workoutSessionId,
+                        name = exerciseSet.name.trim(),
+                    )
+
+                    exerciseSet.exercises.forEach { entry ->
+                        val weight = entry.weight.toDoubleOrNull() ?: return@forEach
+                        val reps = entry.reps.toIntOrNull() ?: return@forEach
+
+                        workoutRepository.addSet(
+                            reps = reps,
+                            weightKg = weight,
+                            exerciseId = exerciseId,
+                        )
+                    }
+                }
                 onSuccess()
             } catch (e: Exception) {
                 onError(e.message ?: "Failed to save workout")
@@ -101,6 +134,23 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 workoutRepository.observeSessionsForUser(user.id).collectLatest { sessions ->
                     _workoutSessions.value = sessions
                 }
+            }
+        }
+    }
+
+    fun observeSessionWithExercisesAndSets(workoutSessionId: Long) {
+        viewModelScope.launch {
+
+            val user = currentUser.value
+            if (user == null) {
+                _selectedSession.value = null
+                return@launch
+            }
+
+            workoutRepository.observeSessionWithExercisesAndSets(
+                userId = user.id, sessionId = workoutSessionId
+            ).distinctUntilChanged().collectLatest { state ->
+                _selectedSession.value = state
             }
         }
     }

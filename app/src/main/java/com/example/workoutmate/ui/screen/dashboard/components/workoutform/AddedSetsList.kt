@@ -39,8 +39,8 @@ import com.example.workoutmate.ui.theme.White
 fun AddedSetsList(
     enabled: Boolean,
     onAddSet: () -> Unit,
-    exercises: List<ExerciseSet>,
-    onDeleteSet: (ExerciseSet) -> Unit
+    exercises: List<Exercise>,
+    onDeleteSet: (Exercise) -> Unit
 ) {
     Column {
         Row(

@@ -66,6 +66,6 @@ fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
     }
 
     if (openDialog) {
-        WorkoutForm(userViewModel = userViewModel, onBackClick = { openDialog = false })
+        WorkoutForm( userViewModel = userViewModel, onBackClick = { openDialog = false })
     }
 }

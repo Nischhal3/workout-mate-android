@@ -4,8 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.example.workoutmate.data.WorkoutSession
+import com.example.workoutmate.data.WorkoutSessionWithExercisesAndSets
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -35,6 +37,18 @@ interface WorkoutSessionDao {
     """
     )
     fun observeForUser(userId: Long): Flow<List<WorkoutSession>>
+
+    @Transaction
+    @Query(
+        """
+    SELECT * FROM workout_sessions
+    WHERE id = :sessionId AND userId = :userId
+"""
+    )
+    fun observeSessionWithExercisesAndSets(
+        userId: Long,
+        sessionId: Long
+    ): Flow<WorkoutSessionWithExercisesAndSets?>
 
     @Query(
         """

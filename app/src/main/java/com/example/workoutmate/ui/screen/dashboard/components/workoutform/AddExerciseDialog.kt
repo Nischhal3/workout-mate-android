@@ -4,12 +4,15 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,12 +21,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,27 +36,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.workoutmate.ui.screen.components.AppButton
 import com.example.workoutmate.ui.screen.components.InputTextField
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.Green
+import com.example.workoutmate.ui.theme.LightGray
 import com.example.workoutmate.ui.theme.LightSage
-import com.example.workoutmate.ui.theme.White
 
-data class ExerciseEntry(
+data class SetEntry(
     val weight: String, val reps: String
 )
 
-data class ExerciseSet(
-    val name: String, val exercises: List<ExerciseEntry> = emptyList()
+data class Exercise(
+    val name: String, val exercises: List<SetEntry> = emptyList()
 )
 
 @Composable
 fun AddExerciseDialog(
-    onDismiss: () -> Unit, onAdd: (ExerciseSet) -> Unit
+    onDismiss: () -> Unit, onAdd: (Exercise) -> Unit
 ) {
-    var setName by remember { mutableStateOf("") }
-    var exerciseEntries by remember { mutableStateOf(listOf(ExerciseEntry("", ""))) }
     val scrollState = rememberScrollState()
+
+    var setName by remember { mutableStateOf("") }
+    var setEntries by remember { mutableStateOf(listOf(SetEntry("", ""))) }
 
     AlertDialog(onDismissRequest = onDismiss, title = {
         Row(
@@ -65,12 +68,12 @@ fun AddExerciseDialog(
                 Text("Add Exercise Set", fontWeight = FontWeight.Bold, color = DarkGreen)
             }
             IconButton(onClick = {
-                exerciseEntries = exerciseEntries + ExerciseEntry("", "")
+                setEntries = setEntries + SetEntry("", "")
             }) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "Add Exercise",
                     tint = DarkGreen,
+                    contentDescription = "Add Exercise",
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -93,63 +96,78 @@ fun AddExerciseDialog(
                     .padding(top = 10.dp),
             )
 
-            exerciseEntries.forEachIndexed { index, entry ->
-                ExerciseEntryRow(entry = entry, onWeightChange = { newWeight ->
-                    exerciseEntries = exerciseEntries.toMutableList()
-                        .also { it[index] = it[index].copy(weight = newWeight) }
-                }, onRepsChange = { newReps ->
-                    exerciseEntries = exerciseEntries.toMutableList()
-                        .also { it[index] = it[index].copy(reps = newReps) }
-                }, onDelete = {
-                    exerciseEntries = exerciseEntries.toMutableList().also { it.removeAt(index) }
-                })
+            setEntries.forEachIndexed { index, entry ->
+                ExerciseEntryRow(
+                    entry = entry,
+                    deleteIconIsEnabled = setEntries.size > 1,
+                    onWeightChange = { newWeight ->
+                        setEntries = setEntries.toMutableList()
+                            .also { it[index] = it[index].copy(weight = newWeight) }
+                    },
+                    onRepsChange = { newReps ->
+                        setEntries = setEntries.toMutableList()
+                            .also { it[index] = it[index].copy(reps = newReps) }
+                    },
+                    onDelete = {
+                        setEntries = setEntries.toMutableList().also { it.removeAt(index) }
+                    })
             }
         }
     }, confirmButton = {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(y = (-15).dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
+            AppButton(
+                text = "Save",
+                enabled = setName.isNotBlank() && setEntries.all { it.weight.isNotBlank() && it.reps.isNotBlank() },
                 onClick = {
-                    if (setName.isNotBlank() && exerciseEntries.isNotEmpty()) {
-                        onAdd(ExerciseSet(setName, exerciseEntries))
+                    if (setName.isNotBlank() && setEntries.isNotEmpty()) {
+                        onAdd(Exercise(setName, setEntries))
                         onDismiss()
                     }
                 },
-                enabled = setName.isNotBlank() && exerciseEntries.all { it.weight.isNotBlank() && it.reps.isNotBlank() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Green, contentColor = White
+                contentPadding = PaddingValues(
+                    horizontal = 4.dp, vertical = 4.dp
                 ),
-                shape = RoundedCornerShape(12.dp),
-            ) {
-                Text("Add Set")
-            }
+                modifier = Modifier
+                    .width(90.dp)
+                    .height(45.dp),
+            )
 
-            OutlinedButton(
+            AppButton(
+                text = "Cancel",
                 onClick = onDismiss,
-                shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(1.dp, Green),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Green),
-            ) {
-                Text("Cancel")
-            }
+                modifier = Modifier
+                    .width(90.dp)
+                    .height(45.dp),
+                contentPadding = PaddingValues(
+                    horizontal = 4.dp, vertical = 4.dp
+                )
+            )
         }
     })
 }
 
 @Composable
 fun ExerciseEntryRow(
-    entry: ExerciseEntry,
+    entry: SetEntry,
+    onDelete: () -> Unit,
+    deleteIconIsEnabled: Boolean,
     onWeightChange: (String) -> Unit,
     onRepsChange: (String) -> Unit,
-    onDelete: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, LightSage),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -175,8 +193,12 @@ fun ExerciseEntryRow(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = DarkGreen)
+            IconButton(onClick = onDelete, enabled = deleteIconIsEnabled) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = if (deleteIconIsEnabled) DarkGreen else LightGray
+                )
             }
         }
     }

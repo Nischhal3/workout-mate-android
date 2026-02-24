@@ -10,7 +10,6 @@ import com.example.workoutmate.data.WorkoutExercise
 import com.example.workoutmate.data.WorkoutSession
 import com.example.workoutmate.data.WorkoutSet
 import com.example.workoutmate.data.dao.UserDao
-import com.example.workoutmate.data.dao.WorkoutDetailsDao
 import com.example.workoutmate.data.dao.WorkoutExerciseDao
 import com.example.workoutmate.data.dao.WorkoutSessionDao
 import com.example.workoutmate.data.dao.WorkoutSetDao
@@ -26,7 +25,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun workoutSetDao(): WorkoutSetDao
     abstract fun workoutSessionDao(): WorkoutSessionDao
-    abstract fun workoutDetailsDao(): WorkoutDetailsDao
     abstract fun workoutExerciseDao(): WorkoutExerciseDao
 
     companion object {

@@ -70,7 +70,7 @@ fun WorkoutSessionList(userViewModel: UserViewModel) {
 
                 items(
                     items = sessionsForDate, key = { it.id }) { session ->
-                    WorkoutSessionItem(session = session)
+                    WorkoutSessionItem(session = session, userViewModel = userViewModel)
                 }
             }
         }

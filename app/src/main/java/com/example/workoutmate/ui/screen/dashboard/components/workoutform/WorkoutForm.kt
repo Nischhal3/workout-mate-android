@@ -46,7 +46,7 @@ fun WorkoutForm(
     var workoutTitle by remember { mutableStateOf("") }
     var showSetForm by remember { mutableStateOf(false) }
     var openDatePicker by remember { mutableStateOf(false) }
-    var exercises by remember { mutableStateOf(listOf<ExerciseSet>()) }
+    var exercises by remember { mutableStateOf(listOf<Exercise>()) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     Surface(
@@ -94,6 +94,7 @@ fun WorkoutForm(
                             userViewModel.addWorkoutSession(
                                 title = workoutTitle,
                                 date = selectedDate,
+                                exercises = exercises,
                                 onError = { message ->
                                 },
                                 onSuccess = {

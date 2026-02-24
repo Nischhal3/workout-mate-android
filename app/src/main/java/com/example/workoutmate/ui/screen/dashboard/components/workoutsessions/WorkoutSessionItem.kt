@@ -1,5 +1,6 @@
 package com.example.workoutmate.ui.screen.dashboard.components.workoutsessions
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,20 +27,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.workoutmate.data.WorkoutSession
 import com.example.workoutmate.ui.theme.DarkGreen
+import com.example.workoutmate.ui.viewmodel.UserViewModel
 import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
 fun WorkoutSessionItem(
-    session: WorkoutSession, onCopyClick: (WorkoutSession) -> Unit = {}
+    session: WorkoutSession,
+    userViewModel: UserViewModel,
+    onCopyClick: (WorkoutSession) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(100.dp)
+            .clickable {
+                userViewModel.observeSessionWithExercisesAndSets(workoutSessionId = session.id)
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(4.dp)
+
     ) {
         Box(
             modifier = Modifier
