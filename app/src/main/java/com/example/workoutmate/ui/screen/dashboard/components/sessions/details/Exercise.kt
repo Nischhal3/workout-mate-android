@@ -55,7 +55,7 @@ fun Exercise(
                     rightIcon = Icons.Outlined.Delete,
                     onLeftIconClick = { editMode = true },
                     title = exerciseWithSets.exercise.name,
-                    modifier = Modifier.height(20.dp),
+                    modifier = Modifier.height(22.dp),
                     textStyle = MaterialTheme.typography.titleSmall,
                 )
             } else {

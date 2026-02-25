@@ -69,9 +69,7 @@ fun Session(
 
                     Exercise(
                         exerciseWithSets = exerciseWithSets,
-                        onSetCheckedChange = { setId, checked ->
-                            // your TODO
-                        },
+                        onSetCheckedChange = { setId, checked -> },
                         onDelete = {
                             userViewModel.deleteExerciseByID(
                                 sessionId = data.session.id,
@@ -80,7 +78,9 @@ fun Session(
                         },
                         updateExerciseName = { newName ->
                             userViewModel.updateExerciseName(
-                                exerciseWithSets.exercise.id, newName
+                                newName = newName,
+                                sessionId = data.session.id,
+                                exerciseId = exerciseWithSets.exercise.id
                             )
                         })
                 }

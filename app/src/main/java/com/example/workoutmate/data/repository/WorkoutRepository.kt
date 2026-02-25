@@ -57,8 +57,10 @@ class WorkoutRepository(
     }
 
     // ---------------- UPDATE ----------------
-    suspend fun updateExerciseName(exerciseId: Long, newName: String) {
-        exerciseDao.updateExerciseName(exerciseId, newName.trim())
+    suspend fun updateExerciseName(exerciseId: Long, sessionId: Long, newName: String) {
+        exerciseDao.updateExerciseName(
+            exerciseId = exerciseId, sessionId = sessionId, newName.trim()
+        )
     }
 
     suspend fun toggleSetCompleted(setId: Long, completed: Boolean) {

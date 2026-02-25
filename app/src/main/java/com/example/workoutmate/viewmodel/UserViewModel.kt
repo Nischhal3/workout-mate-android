@@ -155,12 +155,14 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateExerciseName(exerciseId: Long, newName: String) {
+    fun updateExerciseName(exerciseId: Long, sessionId: Long, newName: String) {
         val trimmed = newName.trim()
         if (trimmed.isBlank()) return
 
         viewModelScope.launch {
-            workoutRepository.updateExerciseName(exerciseId, trimmed)
+            workoutRepository.updateExerciseName(
+                exerciseId, sessionId = sessionId, newName = newName
+            )
         }
     }
 
