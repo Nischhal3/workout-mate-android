@@ -25,7 +25,7 @@ import com.example.workoutmate.ui.screen.dashboard.components.sessions.details.S
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.White
-import com.example.workoutmate.ui.viewmodel.UserViewModel
+import com.example.workoutmate.viewmodel.UserViewModel
 
 @Composable
 fun Dashboard(userViewModel: UserViewModel, navController: NavController) {

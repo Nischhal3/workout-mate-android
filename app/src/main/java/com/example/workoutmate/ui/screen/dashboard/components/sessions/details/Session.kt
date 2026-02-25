@@ -24,7 +24,7 @@ import com.example.workoutmate.data.WorkoutSessionWithExercisesAndSets
 import com.example.workoutmate.ui.screen.components.Header
 import com.example.workoutmate.ui.screen.components.VerticalScrollbar
 import com.example.workoutmate.ui.theme.DividerColor
-import com.example.workoutmate.ui.viewmodel.UserViewModel
+import com.example.workoutmate.viewmodel.UserViewModel
 
 @Composable
 fun Session(

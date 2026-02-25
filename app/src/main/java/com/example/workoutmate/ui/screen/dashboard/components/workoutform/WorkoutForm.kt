@@ -40,8 +40,8 @@ import com.example.workoutmate.ui.theme.DarkGray
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
-import com.example.workoutmate.ui.viewmodel.UserViewModel
-import com.example.workoutmate.ui.viewmodel.WorkoutEditorViewModel
+import com.example.workoutmate.viewmodel.UserViewModel
+import com.example.workoutmate.viewmodel.WorkoutEditorViewModel
 import com.example.workoutmate.utils.toPrettyDateString
 import java.time.LocalDate
 

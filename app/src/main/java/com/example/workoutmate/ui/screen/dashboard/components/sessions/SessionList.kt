@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.workoutmate.ui.screen.components.VerticalScrollbar
 import com.example.workoutmate.ui.theme.DividerColor
-import com.example.workoutmate.ui.viewmodel.UserViewModel
+import com.example.workoutmate.viewmodel.UserViewModel
 import com.example.workoutmate.utils.toPrettyDateString
 
 @Composable

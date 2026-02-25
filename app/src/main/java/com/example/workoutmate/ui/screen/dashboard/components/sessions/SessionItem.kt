@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.workoutmate.data.WorkoutSession
 import com.example.workoutmate.ui.theme.DarkGreen
-import com.example.workoutmate.ui.viewmodel.UserViewModel
+import com.example.workoutmate.viewmodel.UserViewModel
 import java.time.format.TextStyle
 import java.util.Locale
 

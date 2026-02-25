@@ -1,4 +1,4 @@
-package com.example.workoutmate.ui.viewmodel
+package com.example.workoutmate.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
