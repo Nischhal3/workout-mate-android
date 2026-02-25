@@ -73,7 +73,10 @@ fun Session(
                             // your TODO
                         },
                         onDelete = {
-                            //userViewModel.deleteExercise(exerciseWithSets.exercise.id)
+                            userViewModel.deleteExerciseByID(
+                                sessionId = data.session.id,
+                                exerciseId = exerciseWithSets.exercise.id
+                            )
                         },
                         updateExerciseName = { newName ->
                             userViewModel.updateExerciseName(

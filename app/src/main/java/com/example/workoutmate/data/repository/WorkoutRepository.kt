@@ -87,4 +87,9 @@ class WorkoutRepository(
             }
         }
     }
+
+    // ---------------- DELETE ----------------
+    suspend fun deleteExerciseById(exerciseId: Long, sessionId: Long) {
+        exerciseDao.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
+    }
 }

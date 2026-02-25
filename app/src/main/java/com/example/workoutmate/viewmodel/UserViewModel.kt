@@ -164,6 +164,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun deleteExerciseByID(exerciseId: Long, sessionId: Long) {
+        viewModelScope.launch {
+            workoutRepository.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
+        }
+    }
+
     fun clearSelectedWorkoutSession() {
         _selectedSession.value = null
     }
