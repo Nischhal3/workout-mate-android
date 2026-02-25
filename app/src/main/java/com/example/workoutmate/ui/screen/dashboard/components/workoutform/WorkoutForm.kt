@@ -15,14 +15,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.workoutmate.ui.screen.components.DatePickerDialog
 import com.example.workoutmate.ui.screen.components.Header
 import com.example.workoutmate.ui.screen.components.InputTextField
@@ -42,6 +41,7 @@ import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.viewmodel.UserViewModel
+import com.example.workoutmate.ui.viewmodel.WorkoutEditorViewModel
 import com.example.workoutmate.utils.toPrettyDateString
 import java.time.LocalDate
 
@@ -49,10 +49,14 @@ import java.time.LocalDate
 fun WorkoutForm(
     onBackClick: () -> Unit, userViewModel: UserViewModel
 ) {
-    var workoutTitle by remember { mutableStateOf("") }
-    var showSetForm by remember { mutableStateOf(false) }
+    val workoutEditorViewModel: WorkoutEditorViewModel = viewModel()
+
+    val exercises by workoutEditorViewModel.exercises.collectAsState()
+    val workoutTitle by workoutEditorViewModel.workoutTitle.collectAsState()
+    val showAddDialog by workoutEditorViewModel.showAddDialog.collectAsState()
+
     var openDatePicker by remember { mutableStateOf(false) }
-    var exercises by remember { mutableStateOf(listOf<Exercise>()) }
+
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     Surface(
@@ -97,11 +101,11 @@ fun WorkoutForm(
 
                     Header(
                         title = "Add Workout",
-                        onLeftClick = onBackClick,
+                        onLeftIconClick = onBackClick,
                         rightIcon = Icons.Filled.Save,
                         rightIconEnabled = workoutTitle.isNotEmpty(),
                         leftIcon = Icons.AutoMirrored.Filled.ArrowBack,
-                        onRightClick = {
+                        onRightIconClick = {
                             userViewModel.addWorkoutSession(
                                 title = workoutTitle,
                                 date = selectedDate,
@@ -110,6 +114,7 @@ fun WorkoutForm(
                                 },
                                 onSuccess = {
                                     onBackClick()
+                                    workoutEditorViewModel.clear()
                                 })
                         })
 
@@ -126,7 +131,7 @@ fun WorkoutForm(
                             value = workoutTitle,
                             label = "Workout Title",
                             modifier = Modifier.fillMaxWidth(),
-                            onValueChange = { workoutTitle = it },
+                            onValueChange = { workoutEditorViewModel.setWorkoutTitle(it) },
                             trailingContent = {
                                 IconButton(onClick = { openDatePicker = true }) {
                                     Icon(
@@ -140,16 +145,22 @@ fun WorkoutForm(
 
                     AddedSetsList(
                         exercises = exercises,
-                        onAddSet = { showSetForm = true },
-                        enabled = workoutTitle.isNotEmpty()
-                    ) { set ->
-                        exercises = exercises - set
-                    }
+                        onAddSet = { workoutEditorViewModel.setShowAddDialog(show = true) },
+                        enabled = workoutTitle.isNotEmpty(),
+                        onDeleteSet = { set ->
+                            val index = exercises.indexOf(set)
+                            if (index != -1) workoutEditorViewModel.deleteExerciseSet(index)
+                        },
+                        updateExerciseName = { index, newName ->
+                            workoutEditorViewModel.updateExerciseName(index, newName)
+                        })
 
-                    if (showSetForm) {
-                        AddExerciseDialog(onDismiss = { showSetForm = false }, onAdd = { newSet ->
-                            exercises = exercises + newSet
-                            showSetForm = false
+                    if (showAddDialog) {
+                        AddExerciseDialog(onDismiss = {
+                            workoutEditorViewModel.setShowAddDialog(show = false)
+                        }, onAdd = { newSet ->
+                            workoutEditorViewModel.addExerciseSet(newSet)
+                            workoutEditorViewModel.setShowAddDialog(show = false)
                         })
                     }
                 }

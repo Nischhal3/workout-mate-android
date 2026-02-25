@@ -8,7 +8,7 @@ import com.example.workoutmate.data.WorkoutSession
 import com.example.workoutmate.data.WorkoutSessionWithExercisesAndSets
 import com.example.workoutmate.data.repository.UserRepository
 import com.example.workoutmate.data.repository.WorkoutRepository
-import com.example.workoutmate.ui.screen.dashboard.components.workoutform.Exercise
+import com.example.workoutmate.model.Exercise
 import com.example.workoutmate.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -152,6 +152,15 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             ).distinctUntilChanged().collectLatest { state ->
                 _selectedSession.value = state
             }
+        }
+    }
+
+    fun updateExerciseName(exerciseId: Long, newName: String) {
+        val trimmed = newName.trim()
+        if (trimmed.isBlank()) return
+
+        viewModelScope.launch {
+            workoutRepository.updateExerciseName(exerciseId, trimmed)
         }
     }
 

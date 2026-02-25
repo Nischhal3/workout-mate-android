@@ -36,20 +36,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.workoutmate.model.Exercise
+import com.example.workoutmate.model.SetEntry
 import com.example.workoutmate.ui.screen.components.AppButton
 import com.example.workoutmate.ui.screen.components.InputTextField
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.Green
 import com.example.workoutmate.ui.theme.LightGray
 import com.example.workoutmate.ui.theme.LightSage
-
-data class SetEntry(
-    val weight: String, val reps: String
-)
-
-data class Exercise(
-    val name: String, val exercises: List<SetEntry> = emptyList()
-)
 
 @Composable
 fun AddExerciseDialog(

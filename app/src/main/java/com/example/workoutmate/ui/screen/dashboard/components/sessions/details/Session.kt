@@ -1,11 +1,15 @@
 package com.example.workoutmate.ui.screen.dashboard.components.sessions.details
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -43,8 +47,8 @@ fun Session(
         ) {
             Header(
                 title = data.session.title,
-                onLeftClick = onBackClick,
-                onRightClick = onSaveClick,
+                onLeftIconClick = onBackClick,
+                onRightIconClick = onSaveClick,
                 rightIcon = Icons.Filled.Save,
                 leftIcon = Icons.AutoMirrored.Filled.ArrowBack
             )
@@ -52,12 +56,32 @@ fun Session(
         }
 
         Box(modifier = Modifier.weight(1f)) {
-            ExerciseList(
-                listState = listState,
-                exercises = exercises,
-                onEditExercise = { /* TODO */ },
-                onDeleteExercise = { /* TODO */ },
-                onSetCheckedChange = { setId, checked -> /* TODO */ })
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(end = 10.dp),
+                contentPadding = PaddingValues(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(
+                    items = exercises, key = { it.exercise.id }) { exerciseWithSets ->
+
+                    Exercise(
+                        exerciseWithSets = exerciseWithSets,
+                        onSetCheckedChange = { setId, checked ->
+                            // your TODO
+                        },
+                        onDelete = {
+                            //userViewModel.deleteExercise(exerciseWithSets.exercise.id)
+                        },
+                        updateExerciseName = { newName ->
+                            userViewModel.updateExerciseName(
+                                exerciseWithSets.exercise.id, newName
+                            )
+                        })
+                }
+            }
 
             VerticalScrollbar(
                 listState = listState,

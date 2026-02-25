@@ -23,21 +23,20 @@ fun Header(
     title: String,
     leftIcon: ImageVector,
     rightIcon: ImageVector,
-    onLeftClick: (() -> Unit),
-    onRightClick: (() -> Unit),
+    modifier: Modifier = Modifier,
     leftIconTint: Color = Green,
     rightIconTint: Color = Green,
-    modifier: Modifier = Modifier,
+    onLeftIconClick: (() -> Unit),
+    onRightIconClick: (() -> Unit),
     rightIconEnabled: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
-
-    ) {
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = modifier.fillMaxWidth()
     ) {
 
         IconButton(
-            onClick = onLeftClick, modifier = Modifier.size(40.dp)
+            onClick = onLeftIconClick, modifier = Modifier.size(40.dp)
         ) {
             Icon(
                 tint = leftIconTint,
@@ -54,7 +53,7 @@ fun Header(
             modifier = Modifier.weight(1f),
         )
         IconButton(
-            enabled = rightIconEnabled, onClick = onRightClick, modifier = Modifier.size(40.dp)
+            enabled = rightIconEnabled, onClick = onRightIconClick, modifier = Modifier.size(40.dp)
         ) {
             Icon(
                 imageVector = rightIcon,
