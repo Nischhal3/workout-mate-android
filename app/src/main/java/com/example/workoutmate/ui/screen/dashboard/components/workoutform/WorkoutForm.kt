@@ -1,5 +1,10 @@
 package com.example.workoutmate.ui.screen.dashboard.components.workoutform
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,11 +49,13 @@ import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.viewmodel.UserViewModel
 import com.example.workoutmate.viewmodel.WorkoutEditorViewModel
 import com.example.workoutmate.utils.toPrettyDateString
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 
 @Composable
 fun WorkoutForm(
-    onBackClick: () -> Unit, userViewModel: UserViewModel
+    onBackClick: () -> Unit,
+    userViewModel: UserViewModel
 ) {
     val workoutEditorViewModel: WorkoutEditorViewModel = viewModel()
 
@@ -55,16 +63,30 @@ fun WorkoutForm(
     val workoutTitle by workoutEditorViewModel.workoutTitle.collectAsState()
     val showAddDialog by workoutEditorViewModel.showAddDialog.collectAsState()
 
+    var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     var openDatePicker by remember { mutableStateOf(false) }
-
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+
+    LaunchedEffect(showError) {
+        if (showError) {
+            delay(2000)
+            showError = false
+            errorMessage = ""
+        }
+    }
 
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .roundedTopBar(
-                strokeWidth = 1.dp, leftColor = LightSage, rightColor = LightSage, radius = 20.dp
-            ), color = DarkGreen, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                strokeWidth = 1.dp,
+                leftColor = LightSage,
+                rightColor = LightSage,
+                radius = 20.dp
+            ),
+        color = DarkGreen,
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
@@ -93,81 +115,112 @@ fun WorkoutForm(
                     .fillMaxHeight(0.80f)
                     .background(Color.White, shape = RoundedCornerShape(16.dp))
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
+                Box(modifier = Modifier.fillMaxSize()) {
 
-                    Header(
-                        title = "Add Workout",
-                        onLeftIconClick = onBackClick,
-                        rightIcon = Icons.Filled.Save,
-                        rightIconEnabled = workoutTitle.isNotEmpty(),
-                        leftIcon = Icons.AutoMirrored.Filled.ArrowBack,
-                        onRightIconClick = {
-                            userViewModel.addWorkoutSession(
-                                title = workoutTitle,
-                                date = selectedDate,
-                                exercises = exercises,
-                                onSuccess = {
-                                    onBackClick()
-                                    workoutEditorViewModel.clear()
-                                })
-                        })
-
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = "Selected date: ${selectedDate.toPrettyDateString()}",
-                            color = DarkGray,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        Header(
+                            title = "Add Workout",
+                            onLeftIconClick = onBackClick,
+                            rightIcon = Icons.Filled.Save,
+                            rightIconEnabled = workoutTitle.isNotEmpty(),
+                            leftIcon = Icons.AutoMirrored.Filled.ArrowBack,
+                            onRightIconClick = {
+                                userViewModel.addWorkoutSession(
+                                    title = workoutTitle,
+                                    date = selectedDate,
+                                    exercises = exercises,
+                                    onError = { msg ->
+                                        errorMessage = msg
+                                        showError = true
+                                    },
+                                    onSuccess = {
+                                        onBackClick()
+                                        workoutEditorViewModel.clear()
+                                    }
+                                )
+                            }
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
 
-                        InputTextField(
-                            value = workoutTitle,
-                            label = "Workout Title",
-                            modifier = Modifier.fillMaxWidth(),
-                            onValueChange = { workoutEditorViewModel.setWorkoutTitle(it) },
-                            trailingContent = {
-                                IconButton(onClick = { openDatePicker = true }) {
-                                    Icon(
-                                        Icons.Default.DateRange,
-                                        contentDescription = "Select Date",
-                                        tint = DarkGreen
-                                    )
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = "Selected date: ${selectedDate.toPrettyDateString()}",
+                                color = DarkGray,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            InputTextField(
+                                value = workoutTitle,
+                                label = "Workout Title",
+                                modifier = Modifier.fillMaxWidth(),
+                                onValueChange = { workoutEditorViewModel.setWorkoutTitle(it) },
+                                trailingContent = {
+                                    IconButton(onClick = { openDatePicker = true }) {
+                                        Icon(
+                                            Icons.Default.DateRange,
+                                            contentDescription = "Select Date",
+                                            tint = DarkGreen
+                                        )
+                                    }
                                 }
-                            })
+                            )
+                        }
+
+                        AddedSetsList(
+                            exercises = exercises,
+                            onAddSet = { workoutEditorViewModel.setShowAddDialog(show = true) },
+                            enabled = workoutTitle.isNotEmpty(),
+                            onDeleteSet = { set ->
+                                val index = exercises.indexOf(set)
+                                if (index != -1) workoutEditorViewModel.deleteExerciseSet(index)
+                            },
+                            updateExerciseName = { index, newName ->
+                                workoutEditorViewModel.updateExerciseName(index, newName)
+                            }
+                        )
+
+                        if (showAddDialog) {
+                            AddExerciseDialog(
+                                onDismiss = { workoutEditorViewModel.setShowAddDialog(show = false) },
+                                onAdd = { newSet ->
+                                    workoutEditorViewModel.addExerciseSet(newSet)
+                                    workoutEditorViewModel.setShowAddDialog(show = false)
+                                }
+                            )
+                        }
                     }
 
-                    AddedSetsList(
-                        exercises = exercises,
-                        onAddSet = { workoutEditorViewModel.setShowAddDialog(show = true) },
-                        enabled = workoutTitle.isNotEmpty(),
-                        onDeleteSet = { set ->
-                            val index = exercises.indexOf(set)
-                            if (index != -1) workoutEditorViewModel.deleteExerciseSet(index)
-                        },
-                        updateExerciseName = { index, newName ->
-                            workoutEditorViewModel.updateExerciseName(index, newName)
-                        })
-
-                    if (showAddDialog) {
-                        AddExerciseDialog(onDismiss = {
-                            workoutEditorViewModel.setShowAddDialog(show = false)
-                        }, onAdd = { newSet ->
-                            workoutEditorViewModel.addExerciseSet(newSet)
-                            workoutEditorViewModel.setShowAddDialog(show = false)
-                        })
+                    AnimatedVisibility(
+                        visible = showError && errorMessage.isNotBlank(),
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 16.dp),
+                        enter = fadeIn() + slideInVertically { it / 2 },
+                        exit = fadeOut() + slideOutVertically { it / 2 }
+                    ) {
+                        Text(
+                            text = errorMessage,
+                            color = Color.Red,
+                            fontSize = 14.sp,
+                            modifier = Modifier
+                                .background(Color.Transparent)
+                                .padding(8.dp)
+                        )
                     }
                 }
             }
+
             DatePickerDialog(
                 open = openDatePicker,
                 disablePastDates = true,
                 onDismiss = { openDatePicker = false },
-                onDateSelected = { date -> selectedDate = date })
+                onDateSelected = { date -> selectedDate = date }
+            )
         }
     }
 }

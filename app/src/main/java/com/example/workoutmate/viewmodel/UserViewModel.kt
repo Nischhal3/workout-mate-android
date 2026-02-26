@@ -90,7 +90,11 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun addWorkoutSession(
-        title: String, date: LocalDate, onSuccess: () -> Unit, exercises: List<Exercise>
+        title: String,
+        date: LocalDate,
+        onSuccess: () -> Unit,
+        exercises: List<Exercise>,
+        onError: (String) -> Unit
     ) {
         val userId = currentUser.value?.id ?: return
 
@@ -123,8 +127,8 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
                 onSuccess()
-            } catch (e: Exception) {
-                // onError(e.message ?: "Failed to save workout")
+            } catch (_: Exception) {
+                onError("Failed to create workout session.")
             }
         }
     }
