@@ -11,15 +11,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -39,11 +38,14 @@ import androidx.compose.ui.unit.dp
 import com.example.workoutmate.model.Exercise
 import com.example.workoutmate.model.SetEntry
 import com.example.workoutmate.ui.screen.components.AppButton
+import com.example.workoutmate.ui.screen.components.CustomIcon
 import com.example.workoutmate.ui.screen.components.InputTextField
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.Green
 import com.example.workoutmate.ui.theme.LightGray
 import com.example.workoutmate.ui.theme.LightSage
+import com.example.workoutmate.ui.theme.Red
+import com.example.workoutmate.ui.theme.White
 
 @Composable
 fun AddExerciseDialog(
@@ -61,16 +63,20 @@ fun AddExerciseDialog(
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 Text("Add Exercise Set", fontWeight = FontWeight.Bold, color = DarkGreen)
             }
-            IconButton(onClick = {
-                setEntries = setEntries + SetEntry("", "")
-            }) {
-                Icon(
-                    Icons.Default.Add,
-                    tint = DarkGreen,
-                    contentDescription = "Add Exercise",
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+
+            CustomIcon(
+                iconTint = White,
+                icon = Icons.Filled.SaveAlt,
+                useCircularBackground = true,
+                contentDescription = "Save Action",
+                enabled = setName.isNotBlank() && setEntries.all { it.weight.isNotBlank() && it.reps.isNotBlank() },
+                onClick = {
+                    if (setName.isNotBlank() && setEntries.isNotEmpty()) {
+                        onAdd(Exercise(setName, setEntries))
+                        onDismiss()
+                    }
+                }
+            )
         }
     }, text = {
         Column(
@@ -116,14 +122,8 @@ fun AddExerciseDialog(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AppButton(
-                text = "Save",
-                enabled = setName.isNotBlank() && setEntries.all { it.weight.isNotBlank() && it.reps.isNotBlank() },
-                onClick = {
-                    if (setName.isNotBlank() && setEntries.isNotEmpty()) {
-                        onAdd(Exercise(setName, setEntries))
-                        onDismiss()
-                    }
-                },
+                text = "Add Set",
+                onClick = { setEntries = setEntries + SetEntry("", "") },
                 contentPadding = PaddingValues(
                     horizontal = 4.dp, vertical = 4.dp
                 ),
@@ -191,7 +191,7 @@ fun ExerciseEntryRow(
                 Icon(
                     Icons.Default.Delete,
                     contentDescription = "Delete",
-                    tint = if (deleteIconIsEnabled) DarkGreen else LightGray
+                    tint = if (deleteIconIsEnabled) Red else LightGray
                 )
             }
         }

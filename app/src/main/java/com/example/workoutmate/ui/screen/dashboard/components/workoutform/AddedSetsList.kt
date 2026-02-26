@@ -44,12 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workoutmate.model.Exercise
 import com.example.workoutmate.model.SetEntry
+import com.example.workoutmate.ui.screen.components.CustomIcon
 import com.example.workoutmate.ui.screen.components.ExerciseNameEditor
 import com.example.workoutmate.ui.screen.components.Header
 import com.example.workoutmate.ui.theme.DarkGray
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.DividerColor
-import com.example.workoutmate.ui.theme.Green
 import com.example.workoutmate.ui.theme.LightGray
 import com.example.workoutmate.ui.theme.Red
 import com.example.workoutmate.ui.theme.White
@@ -77,14 +77,14 @@ fun AddedSetsList(
                 fontSize = 16.sp
             )
 
-            IconButton(onClick = onAddSet, enabled = enabled) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Set",
-                    modifier = Modifier.size(28.dp),
-                    tint = if (enabled) Green else LightGray
-                )
-            }
+            CustomIcon(
+                iconTint = White,
+                enabled = enabled,
+                onClick = onAddSet,
+                icon = Icons.Default.Add,
+                useCircularBackground = true,
+                contentDescription = "Add Set Action"
+            )
         }
 
         HorizontalDivider(

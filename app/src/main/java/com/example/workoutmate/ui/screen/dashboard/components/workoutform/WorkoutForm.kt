@@ -19,7 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -46,9 +46,10 @@ import com.example.workoutmate.ui.theme.DarkGray
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.LightGreen
 import com.example.workoutmate.ui.theme.LightSage
+import com.example.workoutmate.ui.theme.White
+import com.example.workoutmate.utils.toPrettyDateString
 import com.example.workoutmate.viewmodel.UserViewModel
 import com.example.workoutmate.viewmodel.WorkoutEditorViewModel
-import com.example.workoutmate.utils.toPrettyDateString
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 
@@ -123,9 +124,12 @@ fun WorkoutForm(
                             .padding(16.dp)
                     ) {
                         Header(
+                            leftIconTint = White,
                             title = "Add Workout",
+                            rightIconTint = White,
+                            useCircularBackground = true,
                             onLeftIconClick = onBackClick,
-                            rightIcon = Icons.Filled.Save,
+                            rightIcon = Icons.Filled.SaveAlt,
                             rightIconEnabled = workoutTitle.isNotEmpty(),
                             leftIcon = Icons.AutoMirrored.Filled.ArrowBack,
                             onRightIconClick = {
