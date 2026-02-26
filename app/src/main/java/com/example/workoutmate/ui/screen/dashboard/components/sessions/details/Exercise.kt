@@ -33,7 +33,8 @@ fun Exercise(
     onDelete: () -> Unit,
     exerciseWithSets: WorkoutExerciseWithSets,
     updateExerciseName: (newName: String) -> Unit,
-    onSetCheckedChange: (setId: Long, checked: Boolean) -> Unit,
+    onSaveSet: (setId: Long, weight: Double, reps: Int) -> Unit,
+    onSetCheckedChange: (setId: Long, checked: Boolean) -> Unit
 ) {
     var editMode by remember { mutableStateOf(false) }
 
@@ -71,9 +72,9 @@ fun Exercise(
             HorizontalDivider(color = DividerColor, thickness = 1.dp)
 
             SetList(
+                onSaveSet = onSaveSet,
                 onCheckedChange = onSetCheckedChange,
-                sets = exerciseWithSets.sets.sortedBy { it.setNumber },
-            )
+                sets = exerciseWithSets.sets.sortedBy { it.setNumber })
         }
     }
 }

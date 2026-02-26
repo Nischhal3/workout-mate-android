@@ -71,8 +71,12 @@ class WorkoutRepository(
         )
     }
 
-    suspend fun updateSetValues(setId: Long, weightKg: Double, reps: Int) {
-        setDao.updateValues(setId, weightKg, reps)
+    suspend fun updateSetValues(
+        setId: Long, exerciseId: Long, weightKg: Double, reps: Int
+    ): Int {
+        return setDao.updateSetValues(
+            setId = setId, exerciseId = exerciseId, weightKg = weightKg, reps = reps
+        )
     }
 
     suspend fun reorderExercises(orderedExerciseIds: List<Long>) {

@@ -171,16 +171,35 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         viewModelScope.launch {
             try {
-                val updateRow = workoutRepository.updateSetCompletedStatus(
+                val affectedRows = workoutRepository.updateSetCompletedStatus(
                     setId = setId, exerciseId = exerciseId, completed = completed
                 )
 
-                if (updateRow == 0) {
+                if (affectedRows == 0) {
                     onError("Set not found or mismatched exercise.")
                 }
 
             } catch (e: Exception) {
                 onError(e.message ?: "Failed to update set.")
+            }
+        }
+    }
+
+    fun updateSetValues(
+        reps: Int, setId: Long, weightKg: Double, exerciseId: Long, onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val affectedRows = workoutRepository.updateSetValues(
+                    setId = setId, exerciseId = exerciseId, weightKg = weightKg, reps = reps
+                )
+
+                if (affectedRows == 0) {
+                    onError("Set not found or mismatched exercise.")
+                }
+
+            } catch (e: Exception) {
+                onError(e.message ?: "Unexpected database error")
             }
         }
     }

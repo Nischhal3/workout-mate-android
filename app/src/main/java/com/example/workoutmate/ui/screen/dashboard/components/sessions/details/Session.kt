@@ -72,6 +72,16 @@ fun Session(
 
                     Exercise(
                         exerciseWithSets = exerciseWithSets,
+                        onSaveSet = { setId, weight, reps ->
+                            userViewModel.updateSetValues(
+                                reps = reps,
+                                setId = setId,
+                                weightKg = weight,
+                                exerciseId = exerciseWithSets.exercise.id,
+                                onError = { msg ->
+                                    showToast(context, msg)
+                                })
+                        },
                         onSetCheckedChange = { setId, checked ->
                             userViewModel.updateSetCompletedStatus(
                                 setId = setId,
