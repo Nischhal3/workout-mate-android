@@ -17,8 +17,11 @@ interface WorkoutExerciseDao {
     @Update
     suspend fun update(exercise: WorkoutExercise)
 
-    @Query("DELETE FROM workout_exercises WHERE id = :exerciseId")
-    suspend fun deleteById(exerciseId: Long)
+    @Query("UPDATE workout_exercises SET name = :newName WHERE id = :exerciseId AND sessionId = :sessionId")
+    suspend fun updateExerciseName(exerciseId: Long, sessionId: Long, newName: String): Int
+
+    @Query("DELETE FROM workout_exercises WHERE id = :exerciseId AND sessionId = :sessionId")
+    suspend fun deleteExerciseById(exerciseId: Long, sessionId: Long)
 
     @Query(
         """

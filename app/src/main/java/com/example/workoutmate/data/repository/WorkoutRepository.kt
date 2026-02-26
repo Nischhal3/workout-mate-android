@@ -15,11 +15,13 @@ class WorkoutRepository(
 
     private val setDao = db.workoutSetDao()
     private val sessionDao = db.workoutSessionDao()
-    private val detailsDao = db.workoutDetailsDao()
     private val exerciseDao = db.workoutExerciseDao()
 
     // ---------------- READ ----------------
-    fun observeSession(sessionId: Long) = detailsDao.observeSessionWithExercisesAndSets(sessionId)
+    fun observeSessionsForUser(userId: Long) = sessionDao.observeSessionsForUser(userId)
+
+    fun observeSessionWithExercisesAndSets(userId: Long, sessionId: Long) =
+        sessionDao.observeSessionWithExercisesAndSets(userId = userId, sessionId = sessionId)
 
     // ---------------- CREATE ----------------
     suspend fun createSession(
@@ -55,6 +57,12 @@ class WorkoutRepository(
     }
 
     // ---------------- UPDATE ----------------
+    suspend fun updateExerciseName(exerciseId: Long, sessionId: Long, newName: String) {
+        exerciseDao.updateExerciseName(
+            exerciseId = exerciseId, sessionId = sessionId, newName.trim()
+        )
+    }
+
     suspend fun toggleSetCompleted(setId: Long, completed: Boolean) {
         setDao.setCompleted(setId, completed)
     }
@@ -80,5 +88,21 @@ class WorkoutRepository(
                 setDao.updateSetNumber(setId, idx + 1)
             }
         }
+    }
+
+    // ---------------- DELETE ----------------
+    suspend fun deleteSessionById(
+        sessionId: Long,
+        userId: Long
+    ): Boolean {
+        val rows = sessionDao.deleteSessionById(
+            sessionId = sessionId,
+            userId = userId
+        )
+        return rows > 0
+    }
+
+    suspend fun deleteExerciseById(exerciseId: Long, sessionId: Long) {
+        exerciseDao.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
     }
 }

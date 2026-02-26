@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.workoutmate.ui.screen.dashboard.Dashboard
 import com.example.workoutmate.ui.screen.Home
-import com.example.workoutmate.ui.viewmodel.UserViewModel
+import com.example.workoutmate.viewmodel.UserViewModel
 
 object Routes {
     const val HOME = "home"
@@ -34,7 +34,7 @@ fun NavGraph(
         }
 
         composable(Routes.DASHBOARD) {
-            Dashboard(userViewModel)
+            Dashboard(userViewModel, navController)
         }
     }
 }

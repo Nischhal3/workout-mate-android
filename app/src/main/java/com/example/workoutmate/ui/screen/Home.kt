@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.workoutmate.ui.screen.components.AppButton
 import com.example.workoutmate.ui.screen.components.FlipCard
 import com.example.workoutmate.ui.screen.components.InputTextField
-import com.example.workoutmate.ui.viewmodel.UserViewModel
+import com.example.workoutmate.viewmodel.UserViewModel
 
 private enum class CardSide { CREATE, LOGIN }
 

@@ -4,8 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.example.workoutmate.data.WorkoutSession
+import com.example.workoutmate.data.WorkoutSessionWithExercisesAndSets
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -18,8 +20,19 @@ interface WorkoutSessionDao {
     @Update
     suspend fun update(session: WorkoutSession)
 
-    @Query("DELETE FROM workout_sessions WHERE id = :sessionId")
-    suspend fun deleteById(sessionId: Long)
+    @Query("SELECT * FROM workout_sessions WHERE userId = :userId ORDER BY date DESC, id DESC")
+    fun observeSessionsForUser(userId: Long): Flow<List<WorkoutSession>>
+
+    @Query(
+        """
+        DELETE FROM workout_sessions
+        WHERE id = :sessionId
+        AND userId = :userId
+    """
+    )
+    suspend fun deleteSessionById(
+        sessionId: Long, userId: Long
+    ): Int
 
     @Query("SELECT * FROM workout_sessions WHERE id = :sessionId LIMIT 1")
     suspend fun getById(sessionId: Long): WorkoutSession?
@@ -32,6 +45,17 @@ interface WorkoutSessionDao {
     """
     )
     fun observeForUser(userId: Long): Flow<List<WorkoutSession>>
+
+    @Transaction
+    @Query(
+        """
+    SELECT * FROM workout_sessions
+    WHERE id = :sessionId AND userId = :userId
+"""
+    )
+    fun observeSessionWithExercisesAndSets(
+        userId: Long, sessionId: Long
+    ): Flow<WorkoutSessionWithExercisesAndSets?>
 
     @Query(
         """
