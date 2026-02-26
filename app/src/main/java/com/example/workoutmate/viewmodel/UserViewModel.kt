@@ -166,6 +166,25 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateSetCompletedStatus(
+        setId: Long, exerciseId: Long, completed: Boolean, onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val updateRow = workoutRepository.updateSetCompletedStatus(
+                    setId = setId, exerciseId = exerciseId, completed = completed
+                )
+
+                if (updateRow == 0) {
+                    onError("Set not found or mismatched exercise.")
+                }
+
+            } catch (e: Exception) {
+                onError(e.message ?: "Failed to update set.")
+            }
+        }
+    }
+
     fun deleteSessionById(
         sessionId: Long, onError: (String) -> Unit, onSuccess: () -> Unit
     ) {

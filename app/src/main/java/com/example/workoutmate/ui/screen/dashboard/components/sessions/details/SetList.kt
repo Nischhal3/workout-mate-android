@@ -2,20 +2,26 @@ package com.example.workoutmate.ui.screen.dashboard.components.sessions.details
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.workoutmate.data.WorkoutSet
+import com.example.workoutmate.ui.theme.DarkGray
+import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.LightGray
 
 @Composable
@@ -57,9 +63,19 @@ fun SetList(
                     modifier = Modifier.padding(end = 10.dp),
                     style = MaterialTheme.typography.bodySmall,
                 )
-
-                Checkbox(
-                    checked = set.completed, onCheckedChange = {})
+                Box(
+                    modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center
+                ) {
+                    Checkbox(
+                        checked = set.completed, onCheckedChange = { checked ->
+                            onCheckedChange(set.id, checked)
+                        }, modifier = Modifier.size(8.dp), colors = CheckboxDefaults.colors(
+                            checkedColor = DarkGreen,
+                            checkmarkColor = Color.White,
+                            uncheckedColor = DarkGray.copy(alpha = 0.50f)
+                        )
+                    )
+                }
             }
         }
     }

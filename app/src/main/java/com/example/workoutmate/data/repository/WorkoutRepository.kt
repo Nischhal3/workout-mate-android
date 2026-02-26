@@ -63,8 +63,12 @@ class WorkoutRepository(
         )
     }
 
-    suspend fun toggleSetCompleted(setId: Long, completed: Boolean) {
-        setDao.setCompleted(setId, completed)
+    suspend fun updateSetCompletedStatus(
+        setId: Long, exerciseId: Long, completed: Boolean
+    ): Int {
+        return setDao.updateSetCompletedStatus(
+            setId = setId, exerciseId = exerciseId, completed = completed
+        )
     }
 
     suspend fun updateSetValues(setId: Long, weightKg: Double, reps: Int) {
@@ -92,12 +96,10 @@ class WorkoutRepository(
 
     // ---------------- DELETE ----------------
     suspend fun deleteSessionById(
-        sessionId: Long,
-        userId: Long
+        sessionId: Long, userId: Long
     ): Boolean {
         val rows = sessionDao.deleteSessionById(
-            sessionId = sessionId,
-            userId = userId
+            sessionId = sessionId, userId = userId
         )
         return rows > 0
     }

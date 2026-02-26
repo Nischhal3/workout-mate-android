@@ -40,12 +40,16 @@ interface WorkoutSetDao {
 
     @Query(
         """
-        UPDATE workout_sets
-        SET completed = :completed
-        WHERE id = :setId
+    UPDATE workout_sets
+    SET completed = :completed
+    WHERE id = :setId AND exerciseId = :exerciseId
     """
     )
-    suspend fun setCompleted(setId: Long, completed: Boolean)
+    suspend fun updateSetCompletedStatus(
+        setId: Long,
+        exerciseId: Long,
+        completed: Boolean
+    ): Int
 
     @Query(
         """

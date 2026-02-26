@@ -19,11 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.workoutmate.data.WorkoutSessionWithExercisesAndSets
 import com.example.workoutmate.ui.screen.components.Header
 import com.example.workoutmate.ui.screen.components.VerticalScrollbar
 import com.example.workoutmate.ui.theme.DividerColor
+import com.example.workoutmate.utils.showToast
 import com.example.workoutmate.viewmodel.UserViewModel
 
 @Composable
@@ -33,6 +35,7 @@ fun Session(
     onSaveClick: () -> Unit = {},
     data: WorkoutSessionWithExercisesAndSets,
 ) {
+    val context = LocalContext.current
     val listState = rememberLazyListState()
 
     val exercises = remember(data) {
@@ -69,7 +72,15 @@ fun Session(
 
                     Exercise(
                         exerciseWithSets = exerciseWithSets,
-                        onSetCheckedChange = { setId, checked -> },
+                        onSetCheckedChange = { setId, checked ->
+                            userViewModel.updateSetCompletedStatus(
+                                setId = setId,
+                                completed = checked,
+                                exerciseId = exerciseWithSets.exercise.id,
+                                onError = { msg ->
+                                    showToast(context, msg)
+                                })
+                        },
                         onDelete = {
                             userViewModel.deleteExerciseByID(
                                 sessionId = data.session.id,
