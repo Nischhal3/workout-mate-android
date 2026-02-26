@@ -18,15 +18,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.workoutmate.ui.screen.components.SwipeToDeleteContainer
 import com.example.workoutmate.ui.screen.components.VerticalScrollbar
 import com.example.workoutmate.ui.theme.DividerColor
-import com.example.workoutmate.viewmodel.UserViewModel
+import com.example.workoutmate.utils.showToast
 import com.example.workoutmate.utils.toPrettyDateString
+import com.example.workoutmate.viewmodel.UserViewModel
 
 @Composable
 fun SessionList(userViewModel: UserViewModel) {
+    val context = LocalContext.current
     val listState = rememberLazyListState()
+
     val workoutSessions by userViewModel.sessions.collectAsState()
 
     val groupedSessions = remember(workoutSessions) {
@@ -70,7 +75,18 @@ fun SessionList(userViewModel: UserViewModel) {
 
                 items(
                     items = sessionsForDate, key = { it.id }) { session ->
-                    SessionItem(session = session, userViewModel = userViewModel)
+
+                    SwipeToDeleteContainer(
+                        onDelete = { onError ->
+                            userViewModel.deleteSessionById(sessionId = session.id, onSuccess = {
+                                showToast(context, "Deleted workout session ${session.title}.")
+                            }, onError = { msg ->
+                                showToast(context, msg)
+                                onError()
+                            })
+                        }) {
+                        SessionItem(session = session, userViewModel = userViewModel)
+                    }
                 }
             }
         }

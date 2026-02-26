@@ -91,6 +91,17 @@ class WorkoutRepository(
     }
 
     // ---------------- DELETE ----------------
+    suspend fun deleteSessionById(
+        sessionId: Long,
+        userId: Long
+    ): Boolean {
+        val rows = sessionDao.deleteSessionById(
+            sessionId = sessionId,
+            userId = userId
+        )
+        return rows > 0
+    }
+
     suspend fun deleteExerciseById(exerciseId: Long, sessionId: Long) {
         exerciseDao.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
     }

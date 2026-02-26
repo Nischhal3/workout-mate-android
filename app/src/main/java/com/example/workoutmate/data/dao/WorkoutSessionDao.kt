@@ -23,8 +23,16 @@ interface WorkoutSessionDao {
     @Query("SELECT * FROM workout_sessions WHERE userId = :userId ORDER BY date DESC, id DESC")
     fun observeSessionsForUser(userId: Long): Flow<List<WorkoutSession>>
 
-    @Query("DELETE FROM workout_sessions WHERE id = :sessionId")
-    suspend fun deleteById(sessionId: Long)
+    @Query(
+        """
+        DELETE FROM workout_sessions
+        WHERE id = :sessionId
+        AND userId = :userId
+    """
+    )
+    suspend fun deleteSessionById(
+        sessionId: Long, userId: Long
+    ): Int
 
     @Query("SELECT * FROM workout_sessions WHERE id = :sessionId LIMIT 1")
     suspend fun getById(sessionId: Long): WorkoutSession?
@@ -46,8 +54,7 @@ interface WorkoutSessionDao {
 """
     )
     fun observeSessionWithExercisesAndSets(
-        userId: Long,
-        sessionId: Long
+        userId: Long, sessionId: Long
     ): Flow<WorkoutSessionWithExercisesAndSets?>
 
     @Query(

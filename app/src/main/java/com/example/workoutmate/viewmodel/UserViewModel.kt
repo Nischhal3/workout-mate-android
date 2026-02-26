@@ -166,6 +166,27 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun deleteSessionById(
+        sessionId: Long, onError: (String) -> Unit, onSuccess: () -> Unit
+    ) {
+        val userId = currentUser.value?.id
+        if (userId == null) {
+            onError("No user logged in")
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val ok = workoutRepository.deleteSessionById(
+                    sessionId = sessionId, userId = userId
+                )
+                if (ok) onSuccess() else onError("Session not found for user ${currentUser.value!!.username}")
+            } catch (e: Exception) {
+                onError(e.message ?: "Failed to delete session")
+            }
+        }
+    }
+
     fun deleteExerciseByID(exerciseId: Long, sessionId: Long) {
         viewModelScope.launch {
             workoutRepository.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
