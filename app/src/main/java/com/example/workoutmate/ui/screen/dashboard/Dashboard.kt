@@ -3,6 +3,7 @@ package com.example.workoutmate.ui.screen.dashboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -44,7 +45,7 @@ fun Dashboard(userViewModel: UserViewModel, navController: NavController) {
     var openDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = White, bottomBar = {
+        containerColor = White, contentWindowInsets = WindowInsets(0), bottomBar = {
             DashboardNavBar(onHomeClick = {
                 userViewModel.clearSelectedWorkoutSession()
             }, onAddClick = { openDialog = true })
