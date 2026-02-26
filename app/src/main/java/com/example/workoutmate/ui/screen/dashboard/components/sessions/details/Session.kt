@@ -69,7 +69,21 @@ fun Session(
 
                     Exercise(
                         exerciseWithSets = exerciseWithSets,
-                        onSetCheckedChange = { setId, checked -> },
+                        onSaveSet = { setId, weight, reps ->
+                            userViewModel.updateSetValues(
+                                reps = reps,
+                                setId = setId,
+                                weightKg = weight,
+                                exerciseId = exerciseWithSets.exercise.id,
+                            )
+                        },
+                        onSetCheckedChange = { setId, checked ->
+                            userViewModel.updateSetCompletedStatus(
+                                setId = setId,
+                                completed = checked,
+                                exerciseId = exerciseWithSets.exercise.id,
+                            )
+                        },
                         onDelete = {
                             userViewModel.deleteExerciseByID(
                                 sessionId = data.session.id,

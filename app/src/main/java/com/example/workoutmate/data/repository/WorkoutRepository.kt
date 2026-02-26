@@ -57,18 +57,26 @@ class WorkoutRepository(
     }
 
     // ---------------- UPDATE ----------------
-    suspend fun updateExerciseName(exerciseId: Long, sessionId: Long, newName: String) {
-        exerciseDao.updateExerciseName(
+    suspend fun updateExerciseName(exerciseId: Long, sessionId: Long, newName: String): Int {
+        return exerciseDao.updateExerciseName(
             exerciseId = exerciseId, sessionId = sessionId, newName.trim()
         )
     }
 
-    suspend fun toggleSetCompleted(setId: Long, completed: Boolean) {
-        setDao.setCompleted(setId, completed)
+    suspend fun updateSetCompletedStatus(
+        setId: Long, exerciseId: Long, completed: Boolean
+    ): Int {
+        return setDao.updateSetCompletedStatus(
+            setId = setId, exerciseId = exerciseId, completed = completed
+        )
     }
 
-    suspend fun updateSetValues(setId: Long, weightKg: Double, reps: Int) {
-        setDao.updateValues(setId, weightKg, reps)
+    suspend fun updateSetValues(
+        setId: Long, exerciseId: Long, weightKg: Double, reps: Int
+    ): Int {
+        return setDao.updateSetValues(
+            setId = setId, exerciseId = exerciseId, weightKg = weightKg, reps = reps
+        )
     }
 
     suspend fun reorderExercises(orderedExerciseIds: List<Long>) {
@@ -92,17 +100,15 @@ class WorkoutRepository(
 
     // ---------------- DELETE ----------------
     suspend fun deleteSessionById(
-        sessionId: Long,
-        userId: Long
+        sessionId: Long, userId: Long
     ): Boolean {
         val rows = sessionDao.deleteSessionById(
-            sessionId = sessionId,
-            userId = userId
+            sessionId = sessionId, userId = userId
         )
         return rows > 0
     }
 
-    suspend fun deleteExerciseById(exerciseId: Long, sessionId: Long) {
-        exerciseDao.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
+    suspend fun deleteExerciseById(exerciseId: Long, sessionId: Long): Int {
+        return exerciseDao.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
     }
 }

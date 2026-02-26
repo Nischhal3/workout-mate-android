@@ -110,8 +110,6 @@ fun WorkoutForm(
                                 title = workoutTitle,
                                 date = selectedDate,
                                 exercises = exercises,
-                                onError = { message ->
-                                },
                                 onSuccess = {
                                     onBackClick()
                                     workoutEditorViewModel.clear()

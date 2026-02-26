@@ -9,9 +9,13 @@ import com.example.workoutmate.data.WorkoutSessionWithExercisesAndSets
 import com.example.workoutmate.data.repository.UserRepository
 import com.example.workoutmate.data.repository.WorkoutRepository
 import com.example.workoutmate.model.Exercise
+import com.example.workoutmate.model.UiEvent
 import com.example.workoutmate.utils.Logger
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -32,6 +36,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedSession = MutableStateFlow<WorkoutSessionWithExercisesAndSets?>(null)
 
     val selectedSession: StateFlow<WorkoutSessionWithExercisesAndSets?> = _selectedSession
+
+    private val _events = MutableSharedFlow<UiEvent>(
+        replay = 0, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val events = _events.asSharedFlow()
+
 
     init {
         observeWorkoutSessions()
@@ -80,11 +90,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun addWorkoutSession(
-        title: String,
-        date: LocalDate,
-        onSuccess: () -> Unit,
-        onError: (String) -> Unit,
-        exercises: List<Exercise>
+        title: String, date: LocalDate, onSuccess: () -> Unit, exercises: List<Exercise>
     ) {
         val userId = currentUser.value?.id ?: return
 
@@ -118,7 +124,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 onSuccess()
             } catch (e: Exception) {
-                onError(e.message ?: "Failed to save workout")
+                // onError(e.message ?: "Failed to save workout")
             }
         }
     }
@@ -160,36 +166,115 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         if (trimmed.isBlank()) return
 
         viewModelScope.launch {
-            workoutRepository.updateExerciseName(
-                exerciseId, sessionId = sessionId, newName = newName
-            )
+            try {
+                val affectedRows = workoutRepository.updateExerciseName(
+                    exerciseId = exerciseId, sessionId = sessionId, newName = trimmed
+                )
+
+                if (affectedRows == 0) {
+                    _events.tryEmit(UiEvent.ShowError("Exercise not found or session mismatch."))
+                }
+            } catch (e: Exception) {
+                _events.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update exercise name"))
+            }
+        }
+    }
+
+    fun updateSetCompletedStatus(
+        setId: Long, exerciseId: Long, completed: Boolean
+    ) {
+        viewModelScope.launch {
+            try {
+                val affectedRows = workoutRepository.updateSetCompletedStatus(
+                    setId = setId, exerciseId = exerciseId, completed = completed
+                )
+
+                if (affectedRows == 0) {
+                    _events.tryEmit(UiEvent.ShowError("Set not found or mismatched exercise."))
+                }
+
+            } catch (e: Exception) {
+                _events.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update set."))
+            }
+        }
+    }
+
+    fun updateSetValues(
+        reps: Int, setId: Long, weightKg: Double, exerciseId: Long
+    ) {
+        viewModelScope.launch {
+            try {
+                val affectedRows = workoutRepository.updateSetValues(
+                    setId = setId, exerciseId = exerciseId, weightKg = weightKg, reps = reps
+                )
+
+                if (affectedRows == 0) {
+                    _events.tryEmit(UiEvent.ShowError("Set not found or mismatched exercise."))
+                }
+
+            } catch (e: Exception) {
+                _events.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update set."))
+            }
         }
     }
 
     fun deleteSessionById(
-        sessionId: Long, onError: (String) -> Unit, onSuccess: () -> Unit
+        sessionId: Long, title: String, onResult: (success: Boolean) -> Unit
     ) {
         val userId = currentUser.value?.id
         if (userId == null) {
-            onError("No user logged in")
+            _events.tryEmit(UiEvent.ShowError("No user logged in"))
+            onResult(false)
             return
         }
 
         viewModelScope.launch {
             try {
-                val ok = workoutRepository.deleteSessionById(
+                val deleted = workoutRepository.deleteSessionById(
                     sessionId = sessionId, userId = userId
                 )
-                if (ok) onSuccess() else onError("Session not found for user ${currentUser.value!!.username}")
+                if (deleted) {
+                    onResult(true)
+                    _events.tryEmit(
+                        UiEvent.ShowSuccess("Deleted workout session $title.")
+                    )
+                } else {
+                    _events.tryEmit(
+                        UiEvent.ShowError("Session not found for user ${currentUser.value!!.username}")
+                    )
+                    onResult(false)
+                }
             } catch (e: Exception) {
-                onError(e.message ?: "Failed to delete session")
+                _events.tryEmit(UiEvent.ShowError(e.message ?: "Failed to delete session"))
+                onResult(false)
             }
         }
     }
 
-    fun deleteExerciseByID(exerciseId: Long, sessionId: Long) {
+    fun deleteExerciseByID(
+        exerciseId: Long, sessionId: Long
+    ) {
         viewModelScope.launch {
-            workoutRepository.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
+            try {
+                val affectedRows = workoutRepository.deleteExerciseById(
+                    exerciseId = exerciseId, sessionId = sessionId
+                )
+
+                if (affectedRows > 0) {
+                    _events.tryEmit(
+                        UiEvent.ShowSuccess("Exercise deleted successfully.")
+                    )
+                } else {
+                    _events.tryEmit(
+                        UiEvent.ShowError("Exercise not found or mismatched session.")
+                    )
+                }
+
+            } catch (e: Exception) {
+                _events.tryEmit(
+                    UiEvent.ShowError(e.message ?: "Failed to delete exercise.")
+                )
+            }
         }
     }
 
