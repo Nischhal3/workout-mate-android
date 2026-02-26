@@ -57,8 +57,8 @@ class WorkoutRepository(
     }
 
     // ---------------- UPDATE ----------------
-    suspend fun updateExerciseName(exerciseId: Long, sessionId: Long, newName: String) {
-        exerciseDao.updateExerciseName(
+    suspend fun updateExerciseName(exerciseId: Long, sessionId: Long, newName: String): Int {
+        return exerciseDao.updateExerciseName(
             exerciseId = exerciseId, sessionId = sessionId, newName.trim()
         )
     }
@@ -108,7 +108,7 @@ class WorkoutRepository(
         return rows > 0
     }
 
-    suspend fun deleteExerciseById(exerciseId: Long, sessionId: Long) {
-        exerciseDao.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
+    suspend fun deleteExerciseById(exerciseId: Long, sessionId: Long): Int {
+        return exerciseDao.deleteExerciseById(exerciseId = exerciseId, sessionId = sessionId)
     }
 }
