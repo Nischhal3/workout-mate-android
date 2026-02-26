@@ -1,6 +1,7 @@
 package com.example.workoutmate.viewmodel
 
 import android.app.Application
+import android.database.sqlite.SQLiteConstraintException
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workoutmate.data.User
@@ -127,6 +128,8 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
                 onSuccess()
+            } catch (e: SQLiteConstraintException) {
+                onError(e.toUserMessage())
             } catch (_: Exception) {
                 onError("Failed to create workout session.")
             }
@@ -284,5 +287,24 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearSelectedWorkoutSession() {
         _selectedSession.value = null
+    }
+
+    private fun SQLiteConstraintException.toUserMessage(): String {
+        val errorMessage = message.orEmpty()
+        return when {
+            errorMessage.contains("workout_sessions", true) && errorMessage.contains(
+                "UNIQUE", true
+            ) -> "Workout already exists for this date."
+
+            errorMessage.contains("workout_sets", true) && errorMessage.contains(
+                "UNIQUE", true
+            ) -> "Duplicate set number."
+
+            errorMessage.contains("FOREIGN KEY", true) -> "Data reference error."
+
+            errorMessage.contains("UNIQUE", true) -> "Duplicate entry."
+
+            else -> "Database constraint error."
+        }
     }
 }
