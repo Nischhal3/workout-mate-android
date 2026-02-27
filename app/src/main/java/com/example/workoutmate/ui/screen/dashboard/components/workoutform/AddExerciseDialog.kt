@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.workoutmate.model.Exercise
 import com.example.workoutmate.model.SetEntry
+import com.example.workoutmate.ui.screen.components.AnimatedErrorText
 import com.example.workoutmate.ui.screen.components.AppButton
 import com.example.workoutmate.ui.screen.components.CustomIcon
 import com.example.workoutmate.ui.screen.components.InputTextField
@@ -56,6 +57,10 @@ fun AddExerciseDialog(
     var setName by remember { mutableStateOf("") }
     var setEntries by remember { mutableStateOf(listOf(SetEntry("", ""))) }
 
+    val isFormValid = setName.isNotBlank() && setEntries.isNotEmpty() && setEntries.all { entry ->
+        entry.weight.toDoubleOrNull() != null && entry.reps.toIntOrNull() != null
+    }
+
     AlertDialog(onDismissRequest = onDismiss, title = {
         Row(
             verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
@@ -69,14 +74,13 @@ fun AddExerciseDialog(
                 icon = Icons.Filled.SaveAlt,
                 useCircularBackground = true,
                 contentDescription = "Save Action",
-                enabled = setName.isNotBlank() && setEntries.all { it.weight.isNotBlank() && it.reps.isNotBlank() },
+                enabled = isFormValid,
                 onClick = {
-                    if (setName.isNotBlank() && setEntries.isNotEmpty()) {
+                    if (isFormValid) {
                         onAdd(Exercise(setName, setEntries))
                         onDismiss()
                     }
-                }
-            )
+                })
         }
     }, text = {
         Column(
@@ -153,47 +157,68 @@ fun ExerciseEntryRow(
     entry: SetEntry,
     onDelete: () -> Unit,
     deleteIconIsEnabled: Boolean,
-    onWeightChange: (String) -> Unit,
     onRepsChange: (String) -> Unit,
+    onWeightChange: (String) -> Unit,
 ) {
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, LightSage),
+    val isRepsError = entry.reps.isNotBlank() && entry.reps.toIntOrNull() == null
+    val isWeightError = entry.weight.isNotBlank() && entry.weight.toDoubleOrNull() == null
+
+    val hasError = isWeightError || isRepsError
+
+    val errorMessage = buildString {
+        if (isWeightError) append("Weight must be a number. ")
+        if (isRepsError) append("Reps must be a whole number.")
+    }.trim()
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, LightSage),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            InputTextField(
-                label = "Weight",
-                value = entry.weight,
-                verticalPadding = 8.dp,
-                onValueChange = onWeightChange,
-                modifier = Modifier.weight(1f),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-            InputTextField(
-                label = "Reps",
-                value = entry.reps,
-                verticalPadding = 8.dp,
-                onValueChange = onRepsChange,
-                modifier = Modifier.weight(1f),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-
-            IconButton(onClick = onDelete, enabled = deleteIconIsEnabled) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = if (deleteIconIsEnabled) Red else LightGray
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                InputTextField(
+                    label = "Weight",
+                    value = entry.weight,
+                    verticalPadding = 8.dp,
+                    onValueChange = { onWeightChange(it) },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
+
+                InputTextField(
+                    label = "Reps",
+                    value = entry.reps,
+                    verticalPadding = 8.dp,
+                    onValueChange = { onRepsChange(it) },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+
+                IconButton(onClick = onDelete, enabled = deleteIconIsEnabled) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = if (deleteIconIsEnabled) Red else LightGray
+                    )
+                }
             }
         }
+
+        AnimatedErrorText(
+            visible = hasError,
+            message = errorMessage,
+            modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+        )
     }
 }

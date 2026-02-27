@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.workoutmate.ui.screen.components.AnimatedErrorText
 import com.example.workoutmate.ui.screen.components.DatePickerDialog
 import com.example.workoutmate.ui.screen.components.Header
 import com.example.workoutmate.ui.screen.components.InputTextField
@@ -55,8 +56,7 @@ import java.time.LocalDate
 
 @Composable
 fun WorkoutForm(
-    onBackClick: () -> Unit,
-    userViewModel: UserViewModel
+    onBackClick: () -> Unit, userViewModel: UserViewModel
 ) {
     val workoutEditorViewModel: WorkoutEditorViewModel = viewModel()
 
@@ -81,13 +81,8 @@ fun WorkoutForm(
         modifier = Modifier
             .fillMaxSize()
             .roundedTopBar(
-                strokeWidth = 1.dp,
-                leftColor = LightSage,
-                rightColor = LightSage,
-                radius = 20.dp
-            ),
-        color = DarkGreen,
-        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                strokeWidth = 1.dp, leftColor = LightSage, rightColor = LightSage, radius = 20.dp
+            ), color = DarkGreen, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
@@ -128,7 +123,10 @@ fun WorkoutForm(
                             title = "Add Workout",
                             rightIconTint = White,
                             useCircularBackground = true,
-                            onLeftIconClick = onBackClick,
+                            onLeftIconClick = {
+                                onBackClick()
+                                workoutEditorViewModel.clearForm()
+                            },
                             rightIcon = Icons.Filled.SaveAlt,
                             rightIconEnabled = workoutTitle.isNotEmpty(),
                             leftIcon = Icons.AutoMirrored.Filled.ArrowBack,
@@ -143,11 +141,9 @@ fun WorkoutForm(
                                     },
                                     onSuccess = {
                                         onBackClick()
-                                        workoutEditorViewModel.clear()
-                                    }
-                                )
-                            }
-                        )
+                                        workoutEditorViewModel.clearForm()
+                                    })
+                            })
 
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Text(
@@ -171,22 +167,30 @@ fun WorkoutForm(
                                             tint = DarkGreen
                                         )
                                     }
-                                }
-                            )
+                                })
                         }
 
-                        AddedSetsList(
+                        DraftExerciseList(
                             exercises = exercises,
-                            onAddSet = { workoutEditorViewModel.setShowAddDialog(show = true) },
                             enabled = workoutTitle.isNotEmpty(),
-                            onDeleteSet = { set ->
-                                val index = exercises.indexOf(set)
-                                if (index != -1) workoutEditorViewModel.deleteExerciseSet(index)
+                            onAddSet = { workoutEditorViewModel.setShowAddDialog(show = true) },
+                            onDeleteSet = { setIndex, exerciseIndex ->
+                                workoutEditorViewModel.deleteSet(exerciseIndex, setIndex)
+                            },
+                            onUpdateSet = { setIndex, exerciseIndex, entry ->
+                                workoutEditorViewModel.updateSet(
+                                    newEntry = entry,
+                                    setIndex = setIndex,
+                                    exerciseIndex = exerciseIndex
+                                )
                             },
                             updateExerciseName = { index, newName ->
                                 workoutEditorViewModel.updateExerciseName(index, newName)
-                            }
-                        )
+                            },
+                            onDeleteExercise = { set ->
+                                val index = exercises.indexOf(set)
+                                if (index != -1) workoutEditorViewModel.deleteExercise(index)
+                            })
 
                         if (showAddDialog) {
                             AddExerciseDialog(
@@ -194,28 +198,20 @@ fun WorkoutForm(
                                 onAdd = { newSet ->
                                     workoutEditorViewModel.addExerciseSet(newSet)
                                     workoutEditorViewModel.setShowAddDialog(show = false)
-                                }
-                            )
+                                })
                         }
                     }
 
-                    AnimatedVisibility(
-                        visible = showError && errorMessage.isNotBlank(),
+                    AnimatedErrorText(
+                        visible = showError,
+                        message = errorMessage,
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(bottom = 16.dp),
-                        enter = fadeIn() + slideInVertically { it / 2 },
-                        exit = fadeOut() + slideOutVertically { it / 2 }
-                    ) {
-                        Text(
-                            text = errorMessage,
-                            color = Color.Red,
-                            fontSize = 14.sp,
-                            modifier = Modifier
-                                .background(Color.Transparent)
-                                .padding(8.dp)
-                        )
-                    }
+                        textModifier = Modifier
+                            .background(Color.Transparent)
+                            .padding(8.dp)
+                    )
                 }
             }
 
@@ -223,8 +219,7 @@ fun WorkoutForm(
                 open = openDatePicker,
                 disablePastDates = true,
                 onDismiss = { openDatePicker = false },
-                onDateSelected = { date -> selectedDate = date }
-            )
+                onDateSelected = { date -> selectedDate = date })
         }
     }
 }
