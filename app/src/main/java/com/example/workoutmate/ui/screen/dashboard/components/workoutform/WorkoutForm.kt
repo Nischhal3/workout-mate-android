@@ -55,8 +55,10 @@ fun WorkoutForm(
 ) {
     val workoutEditorViewModel: WorkoutEditorViewModel = viewModel()
 
-    val exercises by workoutEditorViewModel.exercises.collectAsState()
+    val setList by workoutEditorViewModel.setList.collectAsState()
     val workoutTitle by workoutEditorViewModel.workoutTitle.collectAsState()
+    val exerciseName by workoutEditorViewModel.exerciseName.collectAsState()
+    val draftExercises by workoutEditorViewModel.draftExercises.collectAsState()
     val addExerciseDialogIsVisible by workoutEditorViewModel.addExerciseDialogIsVisible.collectAsState()
 
     var showError by remember { mutableStateOf(false) }
@@ -127,9 +129,9 @@ fun WorkoutForm(
                             leftIcon = Icons.AutoMirrored.Filled.ArrowBack,
                             onRightIconClick = {
                                 userViewModel.addWorkoutSession(
-                                    title = workoutTitle,
                                     date = selectedDate,
-                                    exercises = exercises,
+                                    title = workoutTitle,
+                                    exercises = draftExercises,
                                     onError = { msg ->
                                         errorMessage = msg
                                         showError = true
@@ -166,19 +168,25 @@ fun WorkoutForm(
                         }
 
                         DraftExerciseList(
-                            exercises = exercises,
+                            exercises = draftExercises,
                             enabled = workoutTitle.isNotEmpty(),
-                            onDeleteSet = workoutEditorViewModel::deleteSet,
-                            onUpdateSet = workoutEditorViewModel::updateSet,
-                            onDeleteExercise = workoutEditorViewModel::deleteExercise,
+                            onDeleteSet = workoutEditorViewModel::deleteDraftSet,
+                            onUpdateSet = workoutEditorViewModel::updateDraftSet,
                             onAddSet = workoutEditorViewModel::openAddExerciseDialog,
-                            updateExerciseName = workoutEditorViewModel::updateExerciseName
+                            onDeleteExercise = workoutEditorViewModel::deleteDraftExercise,
+                            updateExerciseName = workoutEditorViewModel::updateDraftExerciseName
                         )
 
                         if (addExerciseDialogIsVisible) {
                             AddExerciseDialog(
-                                addExercise = workoutEditorViewModel::addExercise,
-                                onDismiss = workoutEditorViewModel::closeAddExerciseDialog
+                                setList = setList,
+                                exerciseName = exerciseName,
+                                addNewSet = workoutEditorViewModel::addNewSet,
+                                deleteNewSet = workoutEditorViewModel::deleteNewSet,
+                                addNewExercise = workoutEditorViewModel::addNewExercise,
+                                onDismiss = workoutEditorViewModel::closeAddExerciseDialog,
+                                onSetFieldChange = workoutEditorViewModel::onSetFieldChange,
+                                onExerciseNameChange = workoutEditorViewModel::onExerciseNameChange
                             )
                         }
                     }

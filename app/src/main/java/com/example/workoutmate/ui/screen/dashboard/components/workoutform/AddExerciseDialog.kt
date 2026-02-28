@@ -26,16 +26,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.workoutmate.model.Exercise
 import com.example.workoutmate.model.SetEntry
 import com.example.workoutmate.ui.screen.components.AnimatedErrorText
 import com.example.workoutmate.ui.screen.components.AppButton
@@ -47,23 +42,20 @@ import com.example.workoutmate.ui.theme.LightGray
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.Red
 import com.example.workoutmate.ui.theme.White
-import java.util.UUID
 
 @Composable
 fun AddExerciseDialog(
-    onDismiss: () -> Unit, addExercise: (exercise: Exercise) -> Unit
+    exerciseName: String,
+    onDismiss: () -> Unit,
+    addNewSet: () -> Unit,
+    setList: List<SetEntry>,
+    addNewExercise: () -> Unit,
+    deleteNewSet: (id: String) -> Unit,
+    onExerciseNameChange: (exerciseName: String) -> Unit,
+    onSetFieldChange: (
+        setId: String, reps: String?, weight: String?
+    ) -> Unit
 ) {
-    var exerciseName by remember { mutableStateOf("") }
-    var setList by remember {
-        mutableStateOf(
-            listOf(
-                SetEntry(
-                    id = UUID.randomUUID().toString(), weight = "", reps = ""
-                )
-            )
-        )
-    }
-
     val isFormValid = exerciseName.isNotBlank() && setList.isNotEmpty() && setList.all { entry ->
         entry.weight.toDoubleOrNull() != null && entry.reps.toIntOrNull() != null
     }
@@ -84,7 +76,7 @@ fun AddExerciseDialog(
                 enabled = isFormValid,
                 onClick = {
                     if (isFormValid) {
-                        addExercise(Exercise(id = UUID.randomUUID().toString(), exerciseName, setList))
+                        addNewExercise()
                         onDismiss()
                     }
                 })
@@ -99,7 +91,7 @@ fun AddExerciseDialog(
             InputTextField(
                 value = exerciseName,
                 label = "Exercise Name",
-                onValueChange = { exerciseName = it },
+                onValueChange = onExerciseNameChange,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 10.dp, bottom = 12.dp),
@@ -118,24 +110,11 @@ fun AddExerciseDialog(
                         reps = entry.reps,
                         weight = entry.weight,
                         deleteIconIsEnabled = setList.size > 1,
-
-                        onWeightChange = { newWeight ->
-                            setList = setList.map {
-                                if (it.id == entry.id) it.copy(weight = newWeight)
-                                else it
-                            }
-                        },
-
-                        onRepsChange = { newReps ->
-                            setList = setList.map {
-                                if (it.id == entry.id) it.copy(reps = newReps)
-                                else it
-                            }
-                        },
-
                         onDelete = {
-                            setList = setList.filter { it.id != entry.id }
-                        })
+                            deleteNewSet(entry.id)
+                        },
+                        onWeightChange = { onSetFieldChange(entry.id, null, it) },
+                        onRepsChange = { onSetFieldChange(entry.id, it, null) })
                 }
             }
         }
@@ -149,11 +128,7 @@ fun AddExerciseDialog(
         ) {
             AppButton(
                 text = "Add Set",
-                onClick = {
-                    setList = setList + SetEntry(
-                        id = UUID.randomUUID().toString(), weight = "", reps = ""
-                    )
-                },
+                onClick = addNewSet,
                 contentPadding = PaddingValues(
                     horizontal = 4.dp, vertical = 4.dp
                 ),

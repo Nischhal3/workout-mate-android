@@ -3,6 +3,7 @@ package com.example.workoutmate.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.workoutmate.model.Exercise
 import com.example.workoutmate.model.SetEntry
+import com.example.workoutmate.utils.generateId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,8 +16,14 @@ class WorkoutEditorViewModel : ViewModel() {
     private val _workoutTitle = MutableStateFlow("")
     val workoutTitle: StateFlow<String> = _workoutTitle.asStateFlow()
 
-    private val _exercises = MutableStateFlow<List<Exercise>>(emptyList())
-    val exercises: StateFlow<List<Exercise>> = _exercises.asStateFlow()
+    private val _draftExercises = MutableStateFlow<List<Exercise>>(emptyList())
+    val draftExercises: StateFlow<List<Exercise>> = _draftExercises.asStateFlow()
+
+    private val _exerciseName = MutableStateFlow("")
+    val exerciseName: StateFlow<String> = _exerciseName.asStateFlow()
+
+    private val _setList = MutableStateFlow(listOf(SetEntry()))
+    val setList: StateFlow<List<SetEntry>> = _setList.asStateFlow()
 
     private val _addExerciseDialogIsVisible = MutableStateFlow(false)
     val addExerciseDialogIsVisible: StateFlow<Boolean> = _addExerciseDialogIsVisible.asStateFlow()
@@ -30,16 +37,61 @@ class WorkoutEditorViewModel : ViewModel() {
     }
 
     fun closeAddExerciseDialog() {
+        clearNewExercise()
         _addExerciseDialogIsVisible.value = false
     }
 
-    fun addExercise(exercise: Exercise) {
-        _exercises.update { it + exercise }
+    // ---------------- New Exercise & Sets ----------------
+    fun onExerciseNameChange(value: String) {
+        _exerciseName.value = value
+    }
+
+    fun onSetFieldChange(setId: String, reps: String? = null, weight: String? = null) {
+        if (reps == null && weight == null) return
+
+        _setList.update { sets ->
+            var changed = false
+            val updated = sets.map { set ->
+                if (set.id != setId) return@map set
+
+                val newSet = set.copy(
+                    weight = weight ?: set.weight, reps = reps ?: set.reps
+                )
+                if (newSet != set) changed = true
+                newSet
+            }
+            if (changed) updated else sets
+        }
+    }
+
+    fun addNewSet() {
+        _setList.update { it + SetEntry(id = generateId(), weight = "", reps = "") }
+    }
+
+    fun addNewExercise() {
+        _draftExercises.update {
+            it + Exercise(
+                id = generateId(), name = exerciseName.value, setList = setList.value
+            )
+        }
         _addExerciseDialogIsVisible.value = false
     }
 
-    fun updateExerciseName(id: String, newName: String) {
-        _exercises.update { list ->
+    fun deleteNewSet(setId: String) {
+        _setList.update { current ->
+            val updated = current.filter { it.id != setId }
+            updated.ifEmpty { listOf(SetEntry()) }
+        }
+    }
+
+    fun clearNewExercise() {
+        _exerciseName.value = ""
+        _setList.value = listOf(SetEntry())
+    }
+
+    // ---------------- Draft Exercises & Sets ----------------
+    fun updateDraftExerciseName(id: String, newName: String) {
+        _draftExercises.update { list ->
             list.map { exercise ->
                 if (exercise.id == id) exercise.copy(name = newName)
                 else exercise
@@ -47,12 +99,12 @@ class WorkoutEditorViewModel : ViewModel() {
         }
     }
 
-    fun updateSet(
+    fun updateDraftSet(
         exerciseId: String, newSetEntry: SetEntry
     ) {
         if (newSetEntry.weight.toDoubleOrNull() == null || newSetEntry.reps.toIntOrNull() == null) return
 
-        _exercises.update { list ->
+        _draftExercises.update { list ->
             list.map { exercise ->
                 if (exercise.id == exerciseId) {
                     exercise.copy(
@@ -65,16 +117,10 @@ class WorkoutEditorViewModel : ViewModel() {
         }
     }
 
-    fun deleteExercise(exerciseId: String) {
-        _exercises.update { list ->
-            list.filter { it.id != exerciseId }
-        }
-    }
-
-    fun deleteSet(
-        exerciseId: String, setId: String
+    fun deleteDraftSet(
+        setId: String, exerciseId: String
     ) {
-        _exercises.update { list ->
+        _draftExercises.update { list ->
             list.map { exercise ->
                 if (exercise.id == exerciseId) {
                     exercise.copy(
@@ -84,9 +130,16 @@ class WorkoutEditorViewModel : ViewModel() {
         }
     }
 
+    fun deleteDraftExercise(exerciseId: String) {
+        _draftExercises.update { list ->
+            list.filter { it.id != exerciseId }
+        }
+    }
+
     fun clearForm() {
+        clearNewExercise()
         _workoutTitle.value = ""
+        _draftExercises.value = emptyList()
         _addExerciseDialogIsVisible.value = false
-        _exercises.value = emptyList()
     }
 }
