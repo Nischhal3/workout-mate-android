@@ -55,7 +55,7 @@ fun WorkoutForm(
 ) {
     val workoutEditorViewModel: WorkoutEditorViewModel = viewModel()
 
-    val setList by workoutEditorViewModel.setList.collectAsState()
+    val newSetList by workoutEditorViewModel.newSetList.collectAsState()
     val workoutTitle by workoutEditorViewModel.workoutTitle.collectAsState()
     val exerciseName by workoutEditorViewModel.exerciseName.collectAsState()
     val draftExercises by workoutEditorViewModel.draftExercises.collectAsState()
@@ -64,7 +64,9 @@ fun WorkoutForm(
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var openDatePicker by remember { mutableStateOf(false) }
+    var editingSetId by remember { mutableStateOf<String?>(null) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var editingExerciseId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(showError) {
         if (showError) {
@@ -125,8 +127,8 @@ fun WorkoutForm(
                                 workoutEditorViewModel.clearForm()
                             },
                             rightIcon = Icons.Filled.SaveAlt,
-                            rightIconEnabled = workoutTitle.isNotEmpty(),
                             leftIcon = Icons.AutoMirrored.Filled.ArrowBack,
+                            rightIconEnabled = workoutTitle.isNotEmpty() && editingSetId.isNullOrEmpty() && editingExerciseId.isNullOrEmpty(),
                             onRightIconClick = {
                                 userViewModel.addWorkoutSession(
                                     date = selectedDate,
@@ -168,8 +170,12 @@ fun WorkoutForm(
                         }
 
                         DraftExerciseList(
+                            editingSetId = editingSetId,
                             exercises = draftExercises,
                             enabled = workoutTitle.isNotEmpty(),
+                            editingExerciseId = editingExerciseId,
+                            setEditingSetId = { editingSetId = it },
+                            setEditingExerciseId = { editingExerciseId = it },
                             onDeleteSet = workoutEditorViewModel::deleteDraftSet,
                             onUpdateSet = workoutEditorViewModel::updateDraftSet,
                             onAddSet = workoutEditorViewModel::openAddExerciseDialog,
@@ -179,7 +185,7 @@ fun WorkoutForm(
 
                         if (addExerciseDialogIsVisible) {
                             AddExerciseDialog(
-                                setList = setList,
+                                setList = newSetList,
                                 exerciseName = exerciseName,
                                 addNewSet = workoutEditorViewModel::addNewSet,
                                 deleteNewSet = workoutEditorViewModel::deleteNewSet,

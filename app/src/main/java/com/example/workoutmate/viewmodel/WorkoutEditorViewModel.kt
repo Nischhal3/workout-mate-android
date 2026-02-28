@@ -22,8 +22,8 @@ class WorkoutEditorViewModel : ViewModel() {
     private val _exerciseName = MutableStateFlow("")
     val exerciseName: StateFlow<String> = _exerciseName.asStateFlow()
 
-    private val _setList = MutableStateFlow(listOf(SetEntry()))
-    val setList: StateFlow<List<SetEntry>> = _setList.asStateFlow()
+    private val _newSetList = MutableStateFlow(listOf(SetEntry()))
+    val newSetList: StateFlow<List<SetEntry>> = _newSetList.asStateFlow()
 
     private val _addExerciseDialogIsVisible = MutableStateFlow(false)
     val addExerciseDialogIsVisible: StateFlow<Boolean> = _addExerciseDialogIsVisible.asStateFlow()
@@ -49,7 +49,7 @@ class WorkoutEditorViewModel : ViewModel() {
     fun onSetFieldChange(setId: String, reps: String? = null, weight: String? = null) {
         if (reps == null && weight == null) return
 
-        _setList.update { sets ->
+        _newSetList.update { sets ->
             var changed = false
             val updated = sets.map { set ->
                 if (set.id != setId) return@map set
@@ -65,20 +65,20 @@ class WorkoutEditorViewModel : ViewModel() {
     }
 
     fun addNewSet() {
-        _setList.update { it + SetEntry(id = generateId(), weight = "", reps = "") }
+        _newSetList.update { it + SetEntry(id = generateId(), weight = "", reps = "") }
     }
 
     fun addNewExercise() {
         _draftExercises.update {
             it + Exercise(
-                id = generateId(), name = exerciseName.value, setList = setList.value
+                id = generateId(), name = exerciseName.value, setList = newSetList.value
             )
         }
         _addExerciseDialogIsVisible.value = false
     }
 
     fun deleteNewSet(setId: String) {
-        _setList.update { current ->
+        _newSetList.update { current ->
             val updated = current.filter { it.id != setId }
             updated.ifEmpty { listOf(SetEntry()) }
         }
@@ -86,7 +86,7 @@ class WorkoutEditorViewModel : ViewModel() {
 
     fun clearNewExercise() {
         _exerciseName.value = ""
-        _setList.value = listOf(SetEntry())
+        _newSetList.value = listOf(SetEntry())
     }
 
     // ---------------- Draft Exercises & Sets ----------------

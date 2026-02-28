@@ -24,10 +24,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -50,15 +46,16 @@ import com.example.workoutmate.ui.theme.White
 fun DraftExerciseList(
     enabled: Boolean,
     onAddSet: () -> Unit,
+    editingSetId: String?,
     exercises: List<Exercise>,
+    editingExerciseId: String?,
+    setEditingSetId: (value: String?) -> Unit,
     onDeleteExercise: (exerciseId: String) -> Unit,
+    setEditingExerciseId: (value: String?) -> Unit,
     onDeleteSet: (setId: String, id: String) -> Unit,
     onUpdateSet: (exerciseId: String, entry: SetEntry) -> Unit,
     updateExerciseName: (exerciseId: String, newName: String) -> Unit
 ) {
-    var editingSetId by remember { mutableStateOf<String?>(null) }
-    var editingExerciseId by remember { mutableStateOf<String?>(null) }
-
     Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -113,17 +110,15 @@ fun DraftExerciseList(
                         if (editingExerciseId == exerciseId) {
                             ExerciseNameEditor(
                                 exerciseName = name,
-                                cancelEdit = { editingExerciseId = null },
+                                cancelEdit = { setEditingExerciseId(null) },
                                 onSave = { newName ->
-                                    editingExerciseId = null
+                                    setEditingExerciseId(null)
                                     updateExerciseName(exerciseId, newName)
                                 })
                         } else {
                             Header(
                                 rightIconTint = Red,
-                                onLeftIconClick = {
-                                    editingExerciseId = exerciseId
-                                },
+                                onLeftIconClick = { setEditingExerciseId(exerciseId) },
                                 leftIconTint = DarkGray,
                                 title = name,
                                 leftIcon = Icons.Outlined.Edit,
@@ -151,11 +146,11 @@ fun DraftExerciseList(
                                     setLabel = "Set ${index + 1}",
                                     isEditing = editingSetId == setId,
                                     initialWeightKg = weight.toDouble(),
-                                    onEditClick = { editingSetId = setId },
-                                    onCancelEdit = { editingSetId = null },
                                     displayText = "$weight kg × $reps reps",
+                                    onEditClick = { setEditingSetId(setId) },
+                                    onCancelEdit = { setEditingSetId(null) },
                                     onSave = { weight, reps ->
-                                        editingSetId = null
+                                        setEditingSetId(null)
                                         onUpdateSet(
                                             exerciseId, SetEntry(
                                                 id = setId,

@@ -42,6 +42,7 @@ import com.example.workoutmate.ui.theme.LightGray
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.Red
 import com.example.workoutmate.ui.theme.White
+import com.example.workoutmate.utils.validateWorkoutFormInput
 
 @Composable
 fun AddExerciseDialog(
@@ -162,15 +163,10 @@ private fun NewSetEntryRow(
     onRepsChange: (String) -> Unit,
     onWeightChange: (String) -> Unit,
 ) {
-    val isRepsError = reps.isNotBlank() && reps.toIntOrNull() == null
-    val isWeightError = weight.isNotBlank() && weight.toDoubleOrNull() == null
+    val validation = validateWorkoutFormInput(reps, weight)
 
-    val hasError = isWeightError || isRepsError
-
-    val errorMessage = buildString {
-        if (isWeightError) append("Weight must be a number. ")
-        if (isRepsError) append("Reps must be a whole number.")
-    }.trim()
+    val hasError = validation.hasError
+    val errorMessage = validation.errorMessage
 
     Column(
         modifier = Modifier
