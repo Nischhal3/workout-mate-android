@@ -35,6 +35,7 @@ import com.example.workoutmate.ui.screen.components.CustomIcon
 import com.example.workoutmate.ui.screen.components.EditableSetRow
 import com.example.workoutmate.ui.screen.components.ExerciseNameEditor
 import com.example.workoutmate.ui.screen.components.Header
+import com.example.workoutmate.ui.screen.components.SwipeToDeleteContainer
 import com.example.workoutmate.ui.theme.DarkGray
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.DividerColor
@@ -92,85 +93,90 @@ fun DraftExerciseList(
                 val name = exercise.name
                 val exerciseId = exercise.id
 
-                Card(
+                SwipeToDeleteContainer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 4.dp),
                     shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    border = BorderStroke(1.dp, LightGray)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    onDelete = { onDeleteExercise(exerciseId) }) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, LightGray),
+                        colors = CardDefaults.cardColors(containerColor = White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                        if (editingExerciseId == exerciseId) {
-                            ExerciseNameEditor(
-                                exerciseName = name,
-                                cancelEdit = { setEditingExerciseId(null) },
-                                onSave = { newName ->
-                                    setEditingExerciseId(null)
-                                    updateExerciseName(exerciseId, newName)
-                                })
-                        } else {
-                            Header(
-                                rightIconTint = Red,
-                                onLeftIconClick = { setEditingExerciseId(exerciseId) },
-                                leftIconTint = DarkGray,
-                                title = name,
-                                leftIcon = Icons.Outlined.Edit,
-                                rightIcon = Icons.Outlined.Delete,
-                                modifier = Modifier.height(20.dp),
-                                textStyle = MaterialTheme.typography.titleSmall,
-                                onRightIconClick = { onDeleteExercise(exerciseId) },
-                            )
-                        }
-
-                        HorizontalDivider(color = DividerColor, thickness = 1.dp)
-
                         Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            exercise.setList.forEachIndexed { index, set ->
-                                val setId = set.id
-                                val reps = set.reps
-                                val weight = set.weight
-
-                                EditableSetRow(
-                                    initialReps = reps.toInt(),
-                                    displayTextFontSize = 14.sp,
-                                    setLabel = "Set ${index + 1}",
-                                    isEditing = editingSetId == setId,
-                                    initialWeightKg = weight.toDouble(),
-                                    displayText = "$weight kg × $reps reps",
-                                    onEditClick = { setEditingSetId(setId) },
-                                    onCancelEdit = { setEditingSetId(null) },
-                                    onSave = { weight, reps ->
-                                        setEditingSetId(null)
-                                        onUpdateSet(
-                                            exerciseId, SetEntry(
-                                                id = setId,
-                                                reps = reps.toString(),
-                                                weight = weight.toString()
-                                            )
-                                        )
-                                    },
-                                    trailingActions = {
-                                        IconButton(
-                                            modifier = Modifier.size(32.dp),
-                                            onClick = { onDeleteSet(setId, exerciseId) }) {
-                                            Icon(
-                                                Icons.Outlined.Delete,
-                                                tint = Red,
-                                                contentDescription = "Delete",
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                        }
+                            if (editingExerciseId == exerciseId) {
+                                ExerciseNameEditor(
+                                    exerciseName = name,
+                                    cancelEdit = { setEditingExerciseId(null) },
+                                    onSave = { newName ->
+                                        setEditingExerciseId(null)
+                                        updateExerciseName(exerciseId, newName)
                                     })
+                            } else {
+                                Header(
+                                    rightIconTint = Red,
+                                    onLeftIconClick = { setEditingExerciseId(exerciseId) },
+                                    leftIconTint = DarkGray,
+                                    title = name,
+                                    leftIcon = Icons.Outlined.Edit,
+                                    rightIcon = Icons.Outlined.Delete,
+                                    modifier = Modifier.height(20.dp),
+                                    textStyle = MaterialTheme.typography.titleSmall,
+                                    onRightIconClick = { onDeleteExercise(exerciseId) },
+                                )
+                            }
+
+                            HorizontalDivider(color = DividerColor, thickness = 1.dp)
+
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                exercise.setList.forEachIndexed { index, set ->
+                                    val setId = set.id
+                                    val reps = set.reps
+                                    val weight = set.weight
+
+                                    EditableSetRow(
+                                        initialReps = reps.toInt(),
+                                        displayTextFontSize = 14.sp,
+                                        setLabel = "Set ${index + 1}",
+                                        isEditing = editingSetId == setId,
+                                        initialWeightKg = weight.toDouble(),
+                                        displayText = "$weight kg × $reps reps",
+                                        onEditClick = { setEditingSetId(setId) },
+                                        onCancelEdit = { setEditingSetId(null) },
+                                        onSave = { weight, reps ->
+                                            setEditingSetId(null)
+                                            onUpdateSet(
+                                                exerciseId, SetEntry(
+                                                    id = setId,
+                                                    reps = reps.toString(),
+                                                    weight = weight.toString()
+                                                )
+                                            )
+                                        },
+                                        trailingActions = {
+                                            IconButton(
+                                                modifier = Modifier.size(32.dp),
+                                                onClick = { onDeleteSet(setId, exerciseId) }) {
+                                                Icon(
+                                                    Icons.Outlined.Delete,
+                                                    tint = Red,
+                                                    contentDescription = "Delete",
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                            }
+                                        })
+                                }
                             }
                         }
                     }
