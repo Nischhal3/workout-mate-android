@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -47,13 +47,22 @@ import com.example.workoutmate.ui.theme.LightGray
 import com.example.workoutmate.ui.theme.LightSage
 import com.example.workoutmate.ui.theme.Red
 import com.example.workoutmate.ui.theme.White
+import java.util.UUID
 
 @Composable
 fun AddExerciseDialog(
     onDismiss: () -> Unit, onAdd: (Exercise) -> Unit
 ) {
     var exerciseName by remember { mutableStateOf("") }
-    var setList by remember { mutableStateOf(listOf(SetEntry("", ""))) }
+    var setList by remember {
+        mutableStateOf(
+            listOf(
+                SetEntry(
+                    id = UUID.randomUUID().toString(), weight = "", reps = ""
+                )
+            )
+        )
+    }
 
     val isFormValid = exerciseName.isNotBlank() && setList.isNotEmpty() && setList.all { entry ->
         entry.weight.toDoubleOrNull() != null && entry.reps.toIntOrNull() != null
@@ -75,7 +84,7 @@ fun AddExerciseDialog(
                 enabled = isFormValid,
                 onClick = {
                     if (isFormValid) {
-                        onAdd(Exercise(exerciseName, setList))
+                        onAdd(Exercise(id = UUID.randomUUID().toString(), exerciseName, setList))
                         onDismiss()
                     }
                 })
@@ -102,69 +111,33 @@ fun AddExerciseDialog(
                     .heightIn(max = 450.dp),
             ) {
 
-                itemsIndexed(setList) { index, entry ->
+                items(
+                    items = setList, key = { it.id }) { entry ->
 
                     NewSetEntryRow(
-                        weight = entry.weight,
                         reps = entry.reps,
+                        weight = entry.weight,
                         deleteIconIsEnabled = setList.size > 1,
 
                         onWeightChange = { newWeight ->
-                            setList = setList.toMutableList().also {
-                                it[index] = it[index].copy(weight = newWeight)
+                            setList = setList.map {
+                                if (it.id == entry.id) it.copy(weight = newWeight)
+                                else it
                             }
                         },
 
                         onRepsChange = { newReps ->
-                            setList = setList.toMutableList().also {
-                                it[index] = it[index].copy(reps = newReps)
+                            setList = setList.map {
+                                if (it.id == entry.id) it.copy(reps = newReps)
+                                else it
                             }
                         },
 
                         onDelete = {
-                            setList = setList.toMutableList().also {
-                                it.removeAt(index)
-                            }
+                            setList = setList.filter { it.id != entry.id }
                         })
                 }
             }
-
-//            LazyColumn(
-//            verticalArrangement = Arrangement.spacedBy(12.dp),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .heightIn(max = 450.dp),
-//            ) {
-//
-//                items(
-//                    items = setEntries,
-//                    key = { it.id }
-//                ) { entry ->
-//
-//                    NewSetEntryRow(
-//                        entry = entry,
-//                        deleteIconIsEnabled = setEntries.size > 1,
-//
-//                        onWeightChange = { newWeight ->
-//                            setEntries = setEntries.map {
-//                                if (it.id == entry.id) it.copy(weight = newWeight)
-//                                else it
-//                            }
-//                        },
-//
-//                        onRepsChange = { newReps ->
-//                            setEntries = setEntries.map {
-//                                if (it.id == entry.id) it.copy(reps = newReps)
-//                                else it
-//                            }
-//                        },
-//
-//                        onDelete = {
-//                            setEntries = setEntries.filter { it.id != entry.id }
-//                        }
-//                    )
-//                }
-//            }
         }
     }, confirmButton = {
         Row(
@@ -176,7 +149,11 @@ fun AddExerciseDialog(
         ) {
             AppButton(
                 text = "Add Set",
-                onClick = { setList = setList + SetEntry("", "") },
+                onClick = {
+                    setList = setList + SetEntry(
+                        id = UUID.randomUUID().toString(), weight = "", reps = ""
+                    )
+                },
                 contentPadding = PaddingValues(
                     horizontal = 4.dp, vertical = 4.dp
                 ),

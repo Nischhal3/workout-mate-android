@@ -22,40 +22,43 @@ import com.example.workoutmate.ui.theme.Red
 
 @Composable
 fun DraftSetList(
-    entries: List<SetEntry>,
-    onDelete: (setIndex: Int) -> Unit,
-    onUpdateSet: (setIndex: Int, entry: SetEntry) -> Unit,
+    setList: List<SetEntry>,
+    onDelete: (setId: String) -> Unit,
+    onUpdateSet: (entry: SetEntry) -> Unit,
 ) {
-    var editingIndex by remember { mutableStateOf<Int?>(null) }
+    var editingId by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        entries.forEachIndexed { index, entry ->
-            val reps = entry.reps
-            val weight = entry.weight
+        setList.forEachIndexed { index, set ->
+            val id = set.id
+            val reps = set.reps
+            val weight = set.weight
 
             EditableSetRow(
                 initialReps = reps.toInt(),
                 displayTextFontSize = 14.sp,
                 setLabel = "Set ${index + 1}",
-                isEditing = editingIndex == index,
+                isEditing = editingId == id,
                 initialWeightKg = weight.toDouble(),
-                onEditClick = { editingIndex = index },
-                onCancelEdit = { editingIndex = null },
+                onEditClick = { editingId = id },
+                onCancelEdit = { editingId = null },
                 displayText = "$weight kg × $reps reps",
                 onSave = { weight, reps ->
-                    editingIndex = null
-                    onUpdateSet(index, SetEntry(weight = weight.toString(), reps = reps.toString()))
+                    editingId = null
+                    onUpdateSet(
+                        SetEntry(id = id, weight = weight.toString(), reps = reps.toString())
+                    )
                 },
                 trailingActions = {
                     IconButton(
-                        onClick = { onDelete(index) }, modifier = Modifier.size(32.dp)
+                        onClick = { onDelete(id) }, modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
                             Icons.Outlined.Delete,
-                            contentDescription = "Delete",
                             tint = Red,
+                            contentDescription = "Delete",
                             modifier = Modifier.size(18.dp)
                         )
                     }

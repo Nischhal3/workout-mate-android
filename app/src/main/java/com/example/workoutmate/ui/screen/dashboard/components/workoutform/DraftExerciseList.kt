@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -47,12 +47,12 @@ fun DraftExerciseList(
     enabled: Boolean,
     onAddSet: () -> Unit,
     exercises: List<Exercise>,
-    onDeleteExercise: (Exercise) -> Unit,
-    onDeleteSet: (setIndex: Int, exerciseIndex: Int) -> Unit,
-    updateExerciseName: (index: Int, newName: String) -> Unit,
-    onUpdateSet: (setIndex: Int, exerciseIndex: Int, entry: SetEntry) -> Unit
+    onDeleteExercise: (id: String) -> Unit,
+    onDeleteSet: (setId: String, id: String) -> Unit,
+    updateExerciseName: (id: String, newName: String) -> Unit,
+    onUpdateSet: (id: String, entry: SetEntry) -> Unit
 ) {
-    var editingIndex by remember { mutableStateOf<Int?>(null) }
+    var editingId by remember { mutableStateOf<String?>(null) }
 
     Column {
         Row(
@@ -86,7 +86,10 @@ fun DraftExerciseList(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()
         ) {
-            itemsIndexed(exercises) { exerciseIndex, exerciseSet ->
+            items(items = exercises, key = { it.id }) { exercise ->
+                val id = exercise.id
+                val name = exercise.name
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -102,41 +105,38 @@ fun DraftExerciseList(
                             .padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if (editingIndex == exerciseIndex) {
+                        if (editingId == id) {
                             ExerciseNameEditor(
-                                exerciseName = exerciseSet.name,
-                                cancelEdit = { editingIndex = null },
+                                exerciseName = name,
+                                cancelEdit = { editingId = null },
                                 onSave = { newName ->
-                                    editingIndex = null
-                                    updateExerciseName(exerciseIndex, newName)
+                                    editingId = null
+                                    updateExerciseName(id, newName)
                                 })
                         } else {
                             Header(
                                 rightIconTint = Red,
                                 onLeftIconClick = {
-                                    editingIndex = exerciseIndex
+                                    editingId = id
                                 },
                                 leftIconTint = DarkGray,
-                                title = exerciseSet.name,
+                                title = name,
                                 leftIcon = Icons.Outlined.Edit,
                                 rightIcon = Icons.Outlined.Delete,
                                 modifier = Modifier.height(20.dp),
-                                onRightIconClick = { onDeleteExercise(exerciseSet) },
                                 textStyle = MaterialTheme.typography.titleSmall,
+                                onRightIconClick = { onDeleteExercise(id) },
                             )
                         }
 
-                        HorizontalDivider(
-                            color = DividerColor,
-                            thickness = 1.dp,
-                        )
+                        HorizontalDivider(color = DividerColor, thickness = 1.dp)
 
                         DraftSetList(
-                            entries = exerciseSet.exercises,
-                            onDelete = { setIndex -> onDeleteSet(setIndex, exerciseIndex) },
-                            onUpdateSet = { setIndex, entry ->
+                            setList = exercise.setList,
+                            onDelete = { setId -> onDeleteSet(setId, id) },
+                            onUpdateSet = { entry ->
                                 onUpdateSet(
-                                    setIndex, exerciseIndex, entry
+                                    id, entry
                                 )
                             })
                     }

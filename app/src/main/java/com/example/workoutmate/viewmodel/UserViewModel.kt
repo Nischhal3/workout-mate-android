@@ -110,15 +110,15 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                     return@launch
                 }
 
-                exercises.forEach { exerciseSet ->
+                exercises.forEach { exercise ->
                     val exerciseId = workoutRepository.addExercise(
                         sessionId = workoutSessionId,
-                        name = exerciseSet.name.trim(),
+                        name = exercise.name.trim(),
                     )
 
-                    exerciseSet.exercises.forEach { entry ->
-                        val weight = entry.weight.toDoubleOrNull() ?: return@forEach
-                        val reps = entry.reps.toIntOrNull() ?: return@forEach
+                    exercise.setList.forEach { set ->
+                        val weight = set.weight.toDoubleOrNull() ?: return@forEach
+                        val reps = set.reps.toIntOrNull() ?: return@forEach
 
                         workoutRepository.addSet(
                             reps = reps,

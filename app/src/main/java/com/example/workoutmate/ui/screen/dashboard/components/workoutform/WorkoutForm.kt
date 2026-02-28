@@ -166,26 +166,14 @@ fun WorkoutForm(
                         }
 
                         DraftExerciseList(
+                            onDeleteSet = workoutEditorViewModel::deleteSet,
+                            onUpdateSet = workoutEditorViewModel::updateSet,
+                            onDeleteExercise = workoutEditorViewModel::deleteExercise,
                             exercises = exercises,
                             enabled = workoutTitle.isNotEmpty(),
-                            onAddSet = { workoutEditorViewModel.setShowAddDialog(show = true) },
-                            onDeleteSet = { setIndex, exerciseIndex ->
-                                workoutEditorViewModel.deleteSet(exerciseIndex, setIndex)
-                            },
-                            onUpdateSet = { setIndex, exerciseIndex, entry ->
-                                workoutEditorViewModel.updateSet(
-                                    newEntry = entry,
-                                    setIndex = setIndex,
-                                    exerciseIndex = exerciseIndex
-                                )
-                            },
-                            updateExerciseName = { index, newName ->
-                                workoutEditorViewModel.updateExerciseName(index, newName)
-                            },
-                            onDeleteExercise = { set ->
-                                val index = exercises.indexOf(set)
-                                if (index != -1) workoutEditorViewModel.deleteExercise(index)
-                            })
+                            onAddSet = { workoutEditorViewModel.setShowAddDialog(true) },
+                            updateExerciseName = workoutEditorViewModel::updateExerciseName
+                        )
 
                         if (showAddDialog) {
                             AddExerciseDialog(

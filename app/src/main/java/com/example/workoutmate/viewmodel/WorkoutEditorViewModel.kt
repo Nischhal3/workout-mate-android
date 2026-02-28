@@ -34,58 +34,49 @@ class WorkoutEditorViewModel : ViewModel() {
         _showAddDialog.value = false
     }
 
-    fun updateExerciseName(exerciseIndex: Int, newName: String) {
+    fun updateExerciseName(id: String, newName: String) {
         _exercises.update { list ->
-            if (exerciseIndex !in list.indices) return@update list
-
-            list.toMutableList().also {
-                val old = it[exerciseIndex]
-                it[exerciseIndex] = old.copy(name = newName)
+            list.map { exercise ->
+                if (exercise.id == id) exercise.copy(name = newName)
+                else exercise
             }
-        }
-    }
-
-    fun deleteExercise(exerciseIndex: Int) {
-        _exercises.update { list ->
-            if (exerciseIndex !in list.indices) return@update list
-            list.toMutableList().also { it.removeAt(exerciseIndex) }
         }
     }
 
     fun updateSet(
-        setIndex: Int,
-        exerciseIndex: Int,
-        newEntry: SetEntry
+        exerciseId: String, newSetEntry: SetEntry
     ) {
-        val weight = newEntry.weight.toDoubleOrNull()
-        val reps = newEntry.reps.toIntOrNull()
-
-        if (weight == null || reps == null) return
+        if (newSetEntry.weight.toDoubleOrNull() == null || newSetEntry.reps.toIntOrNull() == null) return
 
         _exercises.update { list ->
-            val exercise = list.getOrNull(exerciseIndex) ?: return@update list
-            val sets = exercise.exercises.toMutableList()
-
-            if (setIndex !in sets.indices) return@update list
-
-            sets[setIndex] = newEntry
-
-            list.toMutableList().apply {
-                this[exerciseIndex] = exercise.copy(exercises = sets)
+            list.map { exercise ->
+                if (exercise.id == exerciseId) {
+                    exercise.copy(
+                        setList = exercise.setList.map { set ->
+                            if (set.id == newSetEntry.id) newSetEntry
+                            else set
+                        })
+                } else exercise
             }
         }
     }
 
-    fun deleteSet(exerciseIndex: Int, setIndex: Int) {
+    fun deleteExercise(exerciseId: String) {
         _exercises.update { list ->
-            val ex = list.getOrNull(exerciseIndex) ?: return@update list
-            if (setIndex !in ex.exercises.indices) return@update list
+            list.filter { it.id != exerciseId }
+        }
+    }
 
-            val updatedExercise = ex.copy(
-                exercises = ex.exercises.toMutableList().apply { removeAt(setIndex) }
-            )
-
-            list.toMutableList().apply { this[exerciseIndex] = updatedExercise }
+    fun deleteSet(
+        exerciseId: String, setId: String
+    ) {
+        _exercises.update { list ->
+            list.map { exercise ->
+                if (exercise.id == exerciseId) {
+                    exercise.copy(
+                        setList = exercise.setList.filter { it.id != setId })
+                } else exercise
+            }
         }
     }
 

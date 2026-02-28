@@ -1,9 +1,9 @@
 package com.example.workoutmate.model
 
 data class SetEntry(
-    val weight: String, val reps: String
+    val id: String, val weight: String, val reps: String
 )
 
 data class Exercise(
-    val name: String, val exercises: List<SetEntry> = emptyList()
+    val id: String, val name: String, val setList: List<SetEntry> = emptyList()
 )
