@@ -18,20 +18,24 @@ class WorkoutEditorViewModel : ViewModel() {
     private val _exercises = MutableStateFlow<List<Exercise>>(emptyList())
     val exercises: StateFlow<List<Exercise>> = _exercises.asStateFlow()
 
-    private val _showAddDialog = MutableStateFlow(false)
-    val showAddDialog: StateFlow<Boolean> = _showAddDialog.asStateFlow()
+    private val _addExerciseDialogIsVisible = MutableStateFlow(false)
+    val addExerciseDialogIsVisible: StateFlow<Boolean> = _addExerciseDialogIsVisible.asStateFlow()
 
     fun setWorkoutTitle(title: String) {
         _workoutTitle.value = title
     }
 
-    fun setShowAddDialog(show: Boolean) {
-        _showAddDialog.value = show
+    fun openAddExerciseDialog() {
+        _addExerciseDialogIsVisible.value = true
     }
 
-    fun addExerciseSet(exercise: Exercise) {
+    fun closeAddExerciseDialog() {
+        _addExerciseDialogIsVisible.value = false
+    }
+
+    fun addExercise(exercise: Exercise) {
         _exercises.update { it + exercise }
-        _showAddDialog.value = false
+        _addExerciseDialogIsVisible.value = false
     }
 
     fun updateExerciseName(id: String, newName: String) {
@@ -82,7 +86,7 @@ class WorkoutEditorViewModel : ViewModel() {
 
     fun clearForm() {
         _workoutTitle.value = ""
-        _showAddDialog.value = false
+        _addExerciseDialogIsVisible.value = false
         _exercises.value = emptyList()
     }
 }

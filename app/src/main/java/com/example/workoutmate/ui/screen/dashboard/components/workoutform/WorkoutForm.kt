@@ -57,7 +57,7 @@ fun WorkoutForm(
 
     val exercises by workoutEditorViewModel.exercises.collectAsState()
     val workoutTitle by workoutEditorViewModel.workoutTitle.collectAsState()
-    val showAddDialog by workoutEditorViewModel.showAddDialog.collectAsState()
+    val addExerciseDialogIsVisible by workoutEditorViewModel.addExerciseDialogIsVisible.collectAsState()
 
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
@@ -166,22 +166,20 @@ fun WorkoutForm(
                         }
 
                         DraftExerciseList(
+                            exercises = exercises,
+                            enabled = workoutTitle.isNotEmpty(),
                             onDeleteSet = workoutEditorViewModel::deleteSet,
                             onUpdateSet = workoutEditorViewModel::updateSet,
                             onDeleteExercise = workoutEditorViewModel::deleteExercise,
-                            exercises = exercises,
-                            enabled = workoutTitle.isNotEmpty(),
-                            onAddSet = { workoutEditorViewModel.setShowAddDialog(true) },
+                            onAddSet = workoutEditorViewModel::openAddExerciseDialog,
                             updateExerciseName = workoutEditorViewModel::updateExerciseName
                         )
 
-                        if (showAddDialog) {
+                        if (addExerciseDialogIsVisible) {
                             AddExerciseDialog(
-                                onDismiss = { workoutEditorViewModel.setShowAddDialog(show = false) },
-                                onAdd = { newSet ->
-                                    workoutEditorViewModel.addExerciseSet(newSet)
-                                    workoutEditorViewModel.setShowAddDialog(show = false)
-                                })
+                                addExercise = workoutEditorViewModel::addExercise,
+                                onDismiss = workoutEditorViewModel::closeAddExerciseDialog
+                            )
                         }
                     }
 

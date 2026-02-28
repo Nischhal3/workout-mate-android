@@ -51,7 +51,7 @@ import java.util.UUID
 
 @Composable
 fun AddExerciseDialog(
-    onDismiss: () -> Unit, onAdd: (Exercise) -> Unit
+    onDismiss: () -> Unit, addExercise: (exercise: Exercise) -> Unit
 ) {
     var exerciseName by remember { mutableStateOf("") }
     var setList by remember {
@@ -84,7 +84,7 @@ fun AddExerciseDialog(
                 enabled = isFormValid,
                 onClick = {
                     if (isFormValid) {
-                        onAdd(Exercise(id = UUID.randomUUID().toString(), exerciseName, setList))
+                        addExercise(Exercise(id = UUID.randomUUID().toString(), exerciseName, setList))
                         onDismiss()
                     }
                 })
