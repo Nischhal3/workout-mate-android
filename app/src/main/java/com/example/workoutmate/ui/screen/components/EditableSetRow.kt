@@ -2,6 +2,7 @@ package com.example.workoutmate.ui.screen.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.example.workoutmate.ui.theme.DarkGray
 import com.example.workoutmate.ui.theme.DarkGreen
 import com.example.workoutmate.ui.theme.LightGray
+import com.example.workoutmate.utils.validateWorkoutFormInput
 
 @Composable
 fun EditableSetRow(
@@ -75,60 +77,72 @@ private fun SetEditor(
     var newReps by remember { mutableStateOf(initialReps.toString()) }
     var newWeight by remember { mutableStateOf(initialWeightKg.toString()) }
 
-    val reps = newReps.toIntOrNull()
-    val weight = newWeight.toDoubleOrNull()
-    val canSave = weight != null && weight >= 0.0 && reps != null && reps > 0
     val keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
 
-    Row(
-        modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(modifier = Modifier.weight(1f)) {
-            InputTextField(
-                label = weightLabel,
-                value = newWeight,
-                verticalPadding = 4.dp,
-                horizontalPadding = 8.dp,
-                keyboardOptions = keyboardOptions,
-                onValueChange = { newWeight = it },
-                modifier = Modifier.weight(1f)
-            )
+    val validation = remember(newReps, newWeight) {
+        validateWorkoutFormInput(newReps, newWeight)
+    }
 
-            Spacer(modifier = Modifier.width(8.dp))
+    val hasError = validation.hasError
+    val errorMessage = validation.errorMessage
+    val canSave = !hasError && newReps.isNotEmpty() && newWeight.isNotEmpty()
 
-            InputTextField(
-                label = repsLabel,
-                value = newReps,
-                verticalPadding = 4.dp,
-                horizontalPadding = 8.dp,
-                onValueChange = { newReps = it },
-                keyboardOptions = keyboardOptions,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        IconButton(
-            enabled = canSave,
-            modifier = Modifier.size(28.dp),
-            onClick = { onSave(weight!!, reps!!) }) {
-            Icon(
-                contentDescription = "Save",
-                imageVector = Icons.Outlined.Check,
-                modifier = Modifier.size(20.dp),
-                tint = if (canSave) DarkGreen else DarkGray
-            )
-        }
-
-        IconButton(
-            onClick = cancelEdit, modifier = Modifier.size(28.dp)
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                tint = DarkGray,
-                contentDescription = "Cancel",
-                imageVector = Icons.Outlined.Close,
-                modifier = Modifier.size(20.dp)
-            )
+            Row(modifier = Modifier.weight(1f)) {
+                InputTextField(
+                    label = weightLabel,
+                    value = newWeight,
+                    verticalPadding = 4.dp,
+                    horizontalPadding = 8.dp,
+                    keyboardOptions = keyboardOptions,
+                    onValueChange = { newWeight = it },
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                InputTextField(
+                    label = repsLabel,
+                    value = newReps,
+                    verticalPadding = 4.dp,
+                    horizontalPadding = 8.dp,
+                    onValueChange = { newReps = it },
+                    keyboardOptions = keyboardOptions,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            IconButton(
+                enabled = canSave,
+                modifier = Modifier.size(28.dp),
+                onClick = { onSave(newWeight.toDouble(), newReps.toInt()) }) {
+                Icon(
+                    contentDescription = "Save",
+                    imageVector = Icons.Outlined.Check,
+                    modifier = Modifier.size(20.dp),
+                    tint = if (canSave) DarkGreen else DarkGray
+                )
+            }
+
+            IconButton(
+                onClick = cancelEdit, modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    tint = DarkGray,
+                    contentDescription = "Cancel",
+                    imageVector = Icons.Outlined.Close,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
+        AnimatedErrorText(
+            visible = hasError,
+            message = errorMessage,
+            modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+        )
     }
 }
 
