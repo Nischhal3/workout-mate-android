@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.SaveAlt
@@ -52,12 +52,10 @@ import com.example.workoutmate.ui.theme.White
 fun AddExerciseDialog(
     onDismiss: () -> Unit, onAdd: (Exercise) -> Unit
 ) {
-    val scrollState = rememberScrollState()
+    var exerciseName by remember { mutableStateOf("") }
+    var setList by remember { mutableStateOf(listOf(SetEntry("", ""))) }
 
-    var setName by remember { mutableStateOf("") }
-    var setEntries by remember { mutableStateOf(listOf(SetEntry("", ""))) }
-
-    val isFormValid = setName.isNotBlank() && setEntries.isNotEmpty() && setEntries.all { entry ->
+    val isFormValid = exerciseName.isNotBlank() && setList.isNotEmpty() && setList.all { entry ->
         entry.weight.toDoubleOrNull() != null && entry.reps.toIntOrNull() != null
     }
 
@@ -66,7 +64,7 @@ fun AddExerciseDialog(
             verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
         ) {
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                Text("Add Exercise Set", fontWeight = FontWeight.Bold, color = DarkGreen)
+                Text("New Exercise", fontWeight = FontWeight.Bold, color = DarkGreen)
             }
 
             CustomIcon(
@@ -77,45 +75,96 @@ fun AddExerciseDialog(
                 enabled = isFormValid,
                 onClick = {
                     if (isFormValid) {
-                        onAdd(Exercise(setName, setEntries))
+                        onAdd(Exercise(exerciseName, setList))
                         onDismiss()
                     }
                 })
         }
     }, text = {
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .offset(y = (-25).dp)
-                .heightIn(max = 450.dp)
-                .verticalScroll(scrollState)
         ) {
+
             InputTextField(
-                value = setName,
-                label = "Set Name",
-                onValueChange = { setName = it },
+                value = exerciseName,
+                label = "Exercise Name",
+                onValueChange = { exerciseName = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp),
+                    .padding(top = 10.dp, bottom = 12.dp),
             )
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 450.dp),
+            ) {
 
-            setEntries.forEachIndexed { index, entry ->
-                ExerciseEntryRow(
-                    entry = entry,
-                    deleteIconIsEnabled = setEntries.size > 1,
-                    onWeightChange = { newWeight ->
-                        setEntries = setEntries.toMutableList()
-                            .also { it[index] = it[index].copy(weight = newWeight) }
-                    },
-                    onRepsChange = { newReps ->
-                        setEntries = setEntries.toMutableList()
-                            .also { it[index] = it[index].copy(reps = newReps) }
-                    },
-                    onDelete = {
-                        setEntries = setEntries.toMutableList().also { it.removeAt(index) }
-                    })
+                itemsIndexed(setList) { index, entry ->
+
+                    NewSetEntryRow(
+                        weight = entry.weight,
+                        reps = entry.reps,
+                        deleteIconIsEnabled = setList.size > 1,
+
+                        onWeightChange = { newWeight ->
+                            setList = setList.toMutableList().also {
+                                it[index] = it[index].copy(weight = newWeight)
+                            }
+                        },
+
+                        onRepsChange = { newReps ->
+                            setList = setList.toMutableList().also {
+                                it[index] = it[index].copy(reps = newReps)
+                            }
+                        },
+
+                        onDelete = {
+                            setList = setList.toMutableList().also {
+                                it.removeAt(index)
+                            }
+                        })
+                }
             }
+
+//            LazyColumn(
+//            verticalArrangement = Arrangement.spacedBy(12.dp),
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .heightIn(max = 450.dp),
+//            ) {
+//
+//                items(
+//                    items = setEntries,
+//                    key = { it.id }
+//                ) { entry ->
+//
+//                    NewSetEntryRow(
+//                        entry = entry,
+//                        deleteIconIsEnabled = setEntries.size > 1,
+//
+//                        onWeightChange = { newWeight ->
+//                            setEntries = setEntries.map {
+//                                if (it.id == entry.id) it.copy(weight = newWeight)
+//                                else it
+//                            }
+//                        },
+//
+//                        onRepsChange = { newReps ->
+//                            setEntries = setEntries.map {
+//                                if (it.id == entry.id) it.copy(reps = newReps)
+//                                else it
+//                            }
+//                        },
+//
+//                        onDelete = {
+//                            setEntries = setEntries.filter { it.id != entry.id }
+//                        }
+//                    )
+//                }
+//            }
         }
     }, confirmButton = {
         Row(
@@ -127,7 +176,7 @@ fun AddExerciseDialog(
         ) {
             AppButton(
                 text = "Add Set",
-                onClick = { setEntries = setEntries + SetEntry("", "") },
+                onClick = { setList = setList + SetEntry("", "") },
                 contentPadding = PaddingValues(
                     horizontal = 4.dp, vertical = 4.dp
                 ),
@@ -153,15 +202,16 @@ fun AddExerciseDialog(
 }
 
 @Composable
-fun ExerciseEntryRow(
-    entry: SetEntry,
+private fun NewSetEntryRow(
+    reps: String,
+    weight: String,
     onDelete: () -> Unit,
     deleteIconIsEnabled: Boolean,
     onRepsChange: (String) -> Unit,
     onWeightChange: (String) -> Unit,
 ) {
-    val isRepsError = entry.reps.isNotBlank() && entry.reps.toIntOrNull() == null
-    val isWeightError = entry.weight.isNotBlank() && entry.weight.toDoubleOrNull() == null
+    val isRepsError = reps.isNotBlank() && reps.toIntOrNull() == null
+    val isWeightError = weight.isNotBlank() && weight.toDoubleOrNull() == null
 
     val hasError = isWeightError || isRepsError
 
@@ -188,8 +238,8 @@ fun ExerciseEntryRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 InputTextField(
+                    value = weight,
                     label = "Weight",
-                    value = entry.weight,
                     verticalPadding = 8.dp,
                     onValueChange = { onWeightChange(it) },
                     modifier = Modifier.weight(1f),
@@ -197,8 +247,8 @@ fun ExerciseEntryRow(
                 )
 
                 InputTextField(
+                    value = reps,
                     label = "Reps",
-                    value = entry.reps,
                     verticalPadding = 8.dp,
                     onValueChange = { onRepsChange(it) },
                     modifier = Modifier.weight(1f),
