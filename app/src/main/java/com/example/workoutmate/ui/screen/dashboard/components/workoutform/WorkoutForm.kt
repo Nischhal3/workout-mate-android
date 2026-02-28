@@ -180,7 +180,8 @@ fun WorkoutForm(
                             onUpdateSet = workoutEditorViewModel::updateDraftSet,
                             onAddSet = workoutEditorViewModel::openAddExerciseDialog,
                             onDeleteExercise = workoutEditorViewModel::deleteDraftExercise,
-                            updateExerciseName = workoutEditorViewModel::updateDraftExerciseName
+                            updateExerciseName = workoutEditorViewModel::updateDraftExerciseName,
+                            addNewSetToDraftExerciseList = workoutEditorViewModel::addNewSetToDraftExerciseList
                         )
 
                         if (addExerciseDialogIsVisible) {

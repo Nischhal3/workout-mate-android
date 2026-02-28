@@ -42,6 +42,7 @@ import com.example.workoutmate.ui.theme.DividerColor
 import com.example.workoutmate.ui.theme.LightGray
 import com.example.workoutmate.ui.theme.Red
 import com.example.workoutmate.ui.theme.White
+import com.example.workoutmate.utils.generateId
 
 @Composable
 fun DraftExerciseList(
@@ -55,7 +56,8 @@ fun DraftExerciseList(
     setEditingExerciseId: (value: String?) -> Unit,
     onDeleteSet: (setId: String, id: String) -> Unit,
     onUpdateSet: (exerciseId: String, entry: SetEntry) -> Unit,
-    updateExerciseName: (exerciseId: String, newName: String) -> Unit
+    updateExerciseName: (exerciseId: String, newName: String) -> Unit,
+    addNewSetToDraftExerciseList: (setEntry: SetEntry, exerciseId: String) -> Unit
 ) {
     Column {
         Row(
@@ -72,11 +74,11 @@ fun DraftExerciseList(
 
             CustomIcon(
                 iconTint = White,
-                enabled = enabled,
                 onClick = onAddSet,
                 icon = Icons.Default.Add,
                 useCircularBackground = true,
-                contentDescription = "Add Set Action"
+                contentDescription = "Add Set Action",
+                enabled = enabled && editingSetId.isNullOrEmpty() && editingExerciseId.isNullOrEmpty()
             )
         }
 
@@ -122,15 +124,22 @@ fun DraftExerciseList(
                                     })
                             } else {
                                 Header(
-                                    rightIconTint = Red,
-                                    onLeftIconClick = { setEditingExerciseId(exerciseId) },
-                                    leftIconTint = DarkGray,
                                     title = name,
+                                    leftIconTint = DarkGray,
+                                    rightIconTint = DarkGreen,
                                     leftIcon = Icons.Outlined.Edit,
-                                    rightIcon = Icons.Outlined.Delete,
+                                    rightIcon = Icons.Default.Add,
                                     modifier = Modifier.height(20.dp),
+                                    rightIconEnabled = editingSetId.isNullOrEmpty(),
                                     textStyle = MaterialTheme.typography.titleSmall,
-                                    onRightIconClick = { onDeleteExercise(exerciseId) },
+                                    onLeftIconClick = { setEditingExerciseId(exerciseId) },
+                                    onRightIconClick = {
+                                        addNewSetToDraftExerciseList(
+                                            SetEntry(
+                                                id = generateId(), weight = "5.0", reps = "12"
+                                            ), exerciseId
+                                        )
+                                    },
                                 )
                             }
 

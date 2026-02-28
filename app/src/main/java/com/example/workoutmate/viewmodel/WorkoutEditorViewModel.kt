@@ -90,6 +90,20 @@ class WorkoutEditorViewModel : ViewModel() {
     }
 
     // ---------------- Draft Exercises & Sets ----------------
+    fun addNewSetToDraftExerciseList(setEntry: SetEntry, exerciseId: String) {
+        _draftExercises.update { exercises ->
+            exercises.map { exercise ->
+                if (exercise.id == exerciseId) {
+                    exercise.copy(
+                        setList = exercise.setList + setEntry
+                    )
+                } else {
+                    exercise
+                }
+            }
+        }
+    }
+
     fun updateDraftExerciseName(id: String, newName: String) {
         _draftExercises.update { list ->
             list.map { exercise ->
