@@ -12,11 +12,9 @@ import com.example.workoutmate.data.repository.WorkoutRepository
 import com.example.workoutmate.model.Exercise
 import com.example.workoutmate.model.UiEvent
 import com.example.workoutmate.utils.Logger
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.example.workoutmate.utils.UiEvents
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -37,12 +35,6 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedSession = MutableStateFlow<WorkoutSessionWithExercisesAndSets?>(null)
 
     val selectedSession: StateFlow<WorkoutSessionWithExercisesAndSets?> = _selectedSession
-
-    private val _events = MutableSharedFlow<UiEvent>(
-        replay = 0, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    val events = _events.asSharedFlow()
-
 
     init {
         observeWorkoutSessions()
@@ -179,10 +171,10 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 if (affectedRows == 0) {
-                    _events.tryEmit(UiEvent.ShowError("Exercise not found or session mismatch."))
+                    UiEvents.tryEmit(UiEvent.ShowError("Exercise not found or session mismatch."))
                 }
             } catch (e: Exception) {
-                _events.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update exercise name"))
+                UiEvents.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update exercise name"))
             }
         }
     }
@@ -197,11 +189,11 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 if (affectedRows == 0) {
-                    _events.tryEmit(UiEvent.ShowError("Set not found or mismatched exercise."))
+                    UiEvents.tryEmit(UiEvent.ShowError("Set not found or mismatched exercise."))
                 }
 
             } catch (e: Exception) {
-                _events.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update set."))
+                UiEvents.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update set."))
             }
         }
     }
@@ -216,11 +208,11 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 if (affectedRows == 0) {
-                    _events.tryEmit(UiEvent.ShowError("Set not found or mismatched exercise."))
+                    UiEvents.tryEmit(UiEvent.ShowError("Set not found or mismatched exercise."))
                 }
 
             } catch (e: Exception) {
-                _events.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update set."))
+                UiEvents.tryEmit(UiEvent.ShowError(e.message ?: "Failed to update set."))
             }
         }
     }
@@ -230,7 +222,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         val userId = currentUser.value?.id
         if (userId == null) {
-            _events.tryEmit(UiEvent.ShowError("No user logged in"))
+            UiEvents.tryEmit(UiEvent.ShowError("No user logged in"))
             onResult(false)
             return
         }
@@ -242,17 +234,17 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 if (deleted) {
                     onResult(true)
-                    _events.tryEmit(
+                    UiEvents.tryEmit(
                         UiEvent.ShowSuccess("Deleted workout session $title.")
                     )
                 } else {
-                    _events.tryEmit(
+                    UiEvents.tryEmit(
                         UiEvent.ShowError("Session not found for user ${currentUser.value!!.username}")
                     )
                     onResult(false)
                 }
             } catch (e: Exception) {
-                _events.tryEmit(UiEvent.ShowError(e.message ?: "Failed to delete session"))
+                UiEvents.tryEmit(UiEvent.ShowError(e.message ?: "Failed to delete session"))
                 onResult(false)
             }
         }
@@ -268,17 +260,17 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 if (affectedRows > 0) {
-                    _events.tryEmit(
+                    UiEvents.tryEmit(
                         UiEvent.ShowSuccess("Exercise deleted successfully.")
                     )
                 } else {
-                    _events.tryEmit(
+                    UiEvents.tryEmit(
                         UiEvent.ShowError("Exercise not found or mismatched session.")
                     )
                 }
 
             } catch (e: Exception) {
-                _events.tryEmit(
+                UiEvents.tryEmit(
                     UiEvent.ShowError(e.message ?: "Failed to delete exercise.")
                 )
             }

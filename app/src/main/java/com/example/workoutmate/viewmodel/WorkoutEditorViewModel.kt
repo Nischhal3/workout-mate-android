@@ -3,6 +3,8 @@ package com.example.workoutmate.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.workoutmate.model.Exercise
 import com.example.workoutmate.model.SetEntry
+import com.example.workoutmate.model.UiEvent
+import com.example.workoutmate.utils.UiEvents
 import com.example.workoutmate.utils.generateId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,9 +96,17 @@ class WorkoutEditorViewModel : ViewModel() {
         _draftExercises.update { exercises ->
             exercises.map { exercise ->
                 if (exercise.id == exerciseId) {
-                    exercise.copy(
+                    val updatedExercise = exercise.copy(
                         setList = exercise.setList + setEntry
                     )
+
+                    UiEvents.tryEmit(
+                        UiEvent.ShowSuccess(
+                            message = "Added Set ${updatedExercise.setList.size} for exercise ${exercise.name}."
+                        )
+                    )
+
+                    updatedExercise
                 } else {
                     exercise
                 }
